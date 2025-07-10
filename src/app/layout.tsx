@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Manrope } from "next/font/google";
+import { Asul } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ClerkProvider } from "@clerk/nextjs";
 
-const manrope = Manrope({
+const asulFont = Asul({
   subsets: ["latin"],
-  variable: "--font-manrope",
+  variable: "--font-asul",
+  weight: ["400", "700"], // Add this line
 });
 
 export const metadata: Metadata = {
@@ -24,7 +25,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
         <body
-          className={`${manrope.variable} ${manrope.variable} antialiased`}
+          className={`${asulFont.variable} antialiased`}
           suppressHydrationWarning
         >
           <ThemeProvider

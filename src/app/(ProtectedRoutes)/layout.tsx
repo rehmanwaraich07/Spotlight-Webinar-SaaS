@@ -1,6 +1,8 @@
 import { onAuthenticateUser } from "@/actions/auth";
-import React from "react";
+
 import { redirect } from "next/navigation";
+import Sidebar from "@/components/ReusableComponent/LayoutComponnets/Sidebar";
+import Header from "@/components/ReusableComponent/LayoutComponnets/Header";
 
 type Props = {
   children: React.ReactNode;
@@ -15,8 +17,10 @@ const layout = async ({ children }: Props) => {
   return (
     <div className="flex w-full min-h-screen">
       {/* Side Bar */}
+      <Sidebar />
       <div className="flex flex-col w-full h-screen overflow-auto px-4 scrollbar-hide container mx-auto">
         {/* Header */}
+        <Header user={uesrExists.user} />
 
         {children}
       </div>
