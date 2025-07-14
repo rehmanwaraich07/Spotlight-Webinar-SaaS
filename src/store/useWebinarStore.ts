@@ -7,7 +7,7 @@ import {
 import { CtaTypeEnum } from "@prisma/client";
 import { create } from "zustand";
 
-type WebinarFormState = {
+export type WebinarFormState = {
   basicInfo: {
     webinarName?: string;
     description?: string;

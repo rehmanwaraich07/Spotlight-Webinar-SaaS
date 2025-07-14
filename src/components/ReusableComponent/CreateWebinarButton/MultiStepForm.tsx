@@ -1,8 +1,13 @@
 import { useWebinarStore } from "@/store/useWebinarStore";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertCircle, Check } from "lucide-react";
+import { AlertCircle, Check, ChevronRight, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { createWebinar } from "@/actions/webinar";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 type Step = {
   id: string;
@@ -31,6 +36,52 @@ const MultiStepForm = ({ steps, onComplete }: Props) => {
   const currentStep = steps[currentStepIndex];
   const isFirstStep = currentStepIndex === 0;
   const isLastStep = currentStepIndex === steps.length - 1;
+
+  const router = useRouter();
+
+  const handleBack = () => {
+    if (isFirstStep) {
+      setIsModalOpen(false);
+    } else {
+      setCurrentStepIndex(currentStepIndex - 1);
+      setValidationErrors(null);
+    }
+  };
+
+  const handleNext = async () => {
+    setValidationErrors(null);
+    const isValid = validateStep(currentStep.id as keyof typeof formData);
+
+    if (!isValid) {
+      setValidationErrors("Please fill out all required fields.");
+      return;
+    }
+
+    if (!completedSteps.includes(currentStep.id)) {
+      setCompletedSteps([...completedSteps, currentStep.id]);
+    }
+
+    if (isLastStep) {
+      try {
+        setIsSubmitting(true);
+        const result = await createWebinar(formData);
+        if (result.status === 200 && result.webinarId) {
+          toast.success("Your Webinar has been created successfully!");
+          onComplete(result.webinarId);
+        } else {
+          toast.error(result.message || "Failed to create Webinar.");
+          setValidationErrors(result.message);
+        }
+        router.refresh();
+      } catch (error) {
+        toast.error("Failed to create Webinar.");
+        setValidationErrors("Failed to create Webinar.");
+        console.log(error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  };
 
   return (
     <div className="flex flex-col justify-center items-center bg-[#27272A]/20 border border-border rounded-3xl overflow-hidden max-w-6xl mx-auto backdrop-blur-[106px]">
@@ -160,6 +211,34 @@ const MultiStepForm = ({ steps, onComplete }: Props) => {
             </motion.div>
           </AnimatePresence>
         </div>
+      </div>
+      <div className="w-full p-6 justify-between">
+        <Button
+          variant={"outline"}
+          onClick={handleBack}
+          disabled={isSubmitting}
+          className={cn(
+            "border-gray-700 text-white hover:bg-gray-800",
+            isFirstStep && "opacity-50 cursor-not-allowed"
+          )}
+        >
+          {isFirstStep ? "Cancel" : "Back"}
+        </Button>
+        <Button onClick={handleNext} disabled={isSubmitting}>
+          {isLastStep ? (
+            isSubmitting ? (
+              <>
+                <Loader2 className="animate-spin" />
+                Creating...
+              </>
+            ) : (
+              "Complete"
+            )
+          ) : (
+            "Next"
+          )}
+          {!isLastStep && <ChevronRight className="ml-1 w-4 h-4" />}
+        </Button>
       </div>
     </div>
   );
