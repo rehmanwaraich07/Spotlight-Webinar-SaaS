@@ -1,7 +1,7 @@
 import { useWebinarStore } from "@/store/useWebinarStore";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check } from "lucide-react";
+import { AlertCircle, Check } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 type Step = {
@@ -131,7 +131,35 @@ const MultiStepForm = ({ steps, onComplete }: Props) => {
           orientation="vertical"
           className="data-[orientation=vertical]:h-1/2"
         />
-        <div className="w-ful md:w-2/3 "></div>
+        <div className="w-ful md:w-2/3">
+          <AnimatePresence mode="wait">
+            <motion.div
+              className="p-6"
+              key={currentStep.id}
+              initial={{ x: 20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -20, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold">{currentStep.title}</h2>
+                <p className="text-gray-500">{currentStep.description}</p>
+              </div>
+
+              {/* Render the Current Step Component */}
+              {currentStep.component}
+
+              {/* Validate error messsage */}
+
+              {validationErrors && (
+                <div className="mt-4 p-3 bg-red-900/30 border border-red-800 rounded-md flex items-start gap-2 text-red-300">
+                  <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                  <p>{validationErrors}</p>
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );
