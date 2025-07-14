@@ -1,6 +1,7 @@
 "use client";
 import {
   Tooltip,
+  TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
@@ -41,6 +42,9 @@ const Sidebar = (props: Props) => {
                     )}
                   </Link>
                 </TooltipTrigger>
+                <TooltipContent side="right">
+                  <span className="text-sm">{item.title}</span>
+                </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           ))}

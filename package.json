@@ -43,6 +43,7 @@
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.6.0",
+    "framer-motion": "^12.23.5",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.525.0",
     "next": "15.3.5",
@@ -58,7 +59,8 @@
     "sonner": "^2.0.6",
     "tailwind-merge": "^3.3.1",
     "vaul": "^1.1.2",
-    "zod": "^3.25.74"
+    "zod": "^3.25.74",
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
