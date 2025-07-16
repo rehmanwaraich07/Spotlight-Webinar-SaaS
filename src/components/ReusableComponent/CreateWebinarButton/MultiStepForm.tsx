@@ -84,7 +84,7 @@ const MultiStepForm = ({ steps, onComplete }: Props) => {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center bg-[#27272A]/20 border border-border rounded-3xl overflow-hidden max-w-6xl mx-auto backdrop-blur-[106px]">
+    <div className="flex flex-col justify-center items-center bg-[#27272A]/20 border border-border rounded-3xl overflow-hidden max-w-8xl mx-auto backdrop-blur-[106px]">
       <div className="flex items-center justify-start">
         <div className="w-full md:w-1/3 p-6">
           <div className="space-y-6">
@@ -222,7 +222,7 @@ const MultiStepForm = ({ steps, onComplete }: Props) => {
             isFirstStep && "opacity-50 cursor-not-allowed"
           )}
         >
-          {isFirstStep ? "Cancel" : "Back"}
+          {isFirstStep ? "Cancel" : "back"}
         </Button>
         <Button onClick={handleNext} disabled={isSubmitting}>
           {isLastStep ? (
