@@ -95,7 +95,7 @@ const BasicInfoStep = (props: Props) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label className={errors.date ? "text-red-400" : ""}>
-            Webinar Date <span className="text-red-400">*</span>
+            Webinar date <span className="text-red-400">*</span>
           </Label>
           <Popover>
             <PopoverTrigger asChild>
@@ -130,7 +130,7 @@ const BasicInfoStep = (props: Props) => {
         </div>
         <div className="space-y-2">
           <Label className={errors.time ? "text-red-400" : ""}>
-            Webinar Time <span className="text-red-400">*</span>
+            Webinar time <span className="text-red-400">*</span>
           </Label>
           <div className="flex gap-2">
             <div className="relative flex-1">
@@ -164,7 +164,7 @@ const BasicInfoStep = (props: Props) => {
       </div>
       <div className="flex items-center gap-2 text-sm text-gray-400 mt-4">
         <div className="flex items-center">
-          <Upload className="h-6 w-6 mr-2" />
+          <Upload className="h-4 w-4 mr-2" />
           Uploading a video makes this webinar pre-recorded
         </div>
         <Button

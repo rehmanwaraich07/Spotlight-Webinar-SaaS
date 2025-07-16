@@ -80,14 +80,16 @@ const MultiStepForm = ({ steps, onComplete }: Props) => {
       } finally {
         setIsSubmitting(false);
       }
+    } else {
+      setCurrentStepIndex(currentStepIndex + 1);
     }
   };
 
   return (
-    <div className="flex flex-col justify-center items-center bg-[#27272A]/20 border border-border rounded-3xl overflow-hidden max-w-8xl mx-auto backdrop-blur-[106px]">
+    <div className="flex flex-col justify-center items-center bg-[#27272A]/20 border border-border rounded-3xl overflow-hidden max-w-7xl mx-auto backdrop-blur-[106px]">
       <div className="flex items-center justify-start">
         <div className="w-full md:w-1/3 p-6">
-          <div className="space-y-6">
+          <div className="space-y-4">
             {steps.map((step, index) => {
               const isCompleted = completedSteps.includes(step.id);
               const isCurrent = index === currentStepIndex;
@@ -182,7 +184,7 @@ const MultiStepForm = ({ steps, onComplete }: Props) => {
           orientation="vertical"
           className="data-[orientation=vertical]:h-1/2"
         />
-        <div className="w-ful md:w-2/3">
+        <div className="w-full md:w-2/3">
           <AnimatePresence mode="wait">
             <motion.div
               className="p-6"
@@ -212,19 +214,23 @@ const MultiStepForm = ({ steps, onComplete }: Props) => {
           </AnimatePresence>
         </div>
       </div>
-      <div className="w-full p-6 justify-between">
+      <div className="w-full p-6 justify-between flex items-center">
         <Button
           variant={"outline"}
           onClick={handleBack}
           disabled={isSubmitting}
           className={cn(
-            "border-gray-700 text-white hover:bg-gray-800",
+            "border-gray-700 text-white hover:bg-gray-800 cursor-pointer",
             isFirstStep && "opacity-50 cursor-not-allowed"
           )}
         >
           {isFirstStep ? "Cancel" : "back"}
         </Button>
-        <Button onClick={handleNext} disabled={isSubmitting}>
+        <Button
+          onClick={handleNext}
+          disabled={isSubmitting}
+          className="cursor-pointer"
+        >
           {isLastStep ? (
             isSubmitting ? (
               <>

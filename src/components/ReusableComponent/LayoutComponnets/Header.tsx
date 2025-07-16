@@ -21,7 +21,7 @@ const Header = ({ user }: Props) => {
           variant={"outline"}
           onClick={() => router.push("/webinar")}
         >
-          <ArrowLeft /> Back to Webinars
+          <ArrowLeft /> back to Webinars
         </Button>
       ) : (
         <div className="px-4 py-2 flex justify-center font-bold items-center rounded-lg bg-background border border-border text-primary capitalize hover:bg-background/10">

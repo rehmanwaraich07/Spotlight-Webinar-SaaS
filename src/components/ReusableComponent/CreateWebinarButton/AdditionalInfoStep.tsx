@@ -43,6 +43,7 @@ const AdditionalInfoStep = (props: Props) => {
           id="lock-chat"
           checked={lockChat || false}
           onCheckedChange={handleToggleLockChat}
+          className="cursor-pointer"
         />
       </div>
       <div className="space-y-4">
@@ -59,6 +60,7 @@ const AdditionalInfoStep = (props: Props) => {
             id="coupon-enabled"
             checked={couponEnabled || false}
             onCheckedChange={handleToggleCoupon}
+            className="cursor-pointer"
           />
         </div>
         {couponEnabled && (

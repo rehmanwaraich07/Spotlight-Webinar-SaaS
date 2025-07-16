@@ -86,7 +86,7 @@ const CTAStep = ({}: Props) => {
                   className="text-gray-400 hover:text-white"
                   onClick={() => removeTag(tag)}
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-4 w-4 cursor-pointer" />
                 </button>
               </div>
             ))}

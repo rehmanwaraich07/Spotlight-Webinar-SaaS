@@ -1,4 +1,3 @@
-"use client";
 import {
   Dialog,
   DialogContent,
@@ -57,7 +56,7 @@ const CreateWebinarButton = (props: Props) => {
           <PlusIcon className="w-5 h-5" /> Create Webinar
         </button>
       </DialogTrigger>
-      <DialogContent className="sm:w-[900px] p-0 bg-transparent border-none">
+      <DialogContent className="sm:w-[900px] p-0 bg-transparent border-none w-full">
         {isComplete ? (
           <div className="bg-muted text-primary rounded-lg overflow-hidden">
             <DialogTitle className="sr-only">Webinar Created</DialogTitle>
