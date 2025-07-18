@@ -22,19 +22,19 @@ const CreateWebinarButton = (props: Props) => {
     {
       id: "basicInfo",
       title: "Basic Information",
-      description: "Enter the basic information for your webinar",
+      description: "Enter Basic Information for Webinar",
       component: <BasicInfoStep />,
     },
     {
       id: "cta",
       title: "CTA",
-      description: "Enter the CTA for your webinar",
+      description: "Enter the CTA for Webinar",
       component: <CTAStep assistants={[]} stripeProducts={[]} />,
     },
     {
       id: "additionalInfo",
       title: "Additional Information",
-      description: "Enter additional information for your webinar",
+      description: "Enter Additional information for Webinar",
       component: <AdditionalInfoStep />,
     },
   ];
@@ -56,7 +56,7 @@ const CreateWebinarButton = (props: Props) => {
           <PlusIcon className="w-5 h-5" /> Create Webinar
         </button>
       </DialogTrigger>
-      <DialogContent className="sm:w-[900px] p-0 bg-transparent border-none w-full">
+      <DialogContent className="sm:w-[900px] p-0 bg-transparent border-none xl:min-w-fit">
         {isComplete ? (
           <div className="bg-muted text-primary rounded-lg overflow-hidden">
             <DialogTitle className="sr-only">Webinar Created</DialogTitle>
