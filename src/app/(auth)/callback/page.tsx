@@ -15,7 +15,7 @@ const AuthCallbackPage = async () => {
   ) {
     redirect("/");
   }
-  return <div>AuthCallbackPage</div>;
+  return <div className="bg-black h-[100%] w-[100%]">AuthCallbackPage</div>;
 };
 
 export default AuthCallbackPage;
