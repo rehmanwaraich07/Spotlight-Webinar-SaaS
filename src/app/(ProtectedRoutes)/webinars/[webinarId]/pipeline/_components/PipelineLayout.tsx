@@ -1,6 +1,6 @@
 import UserInfoCard from "@/components/ReusableComponent/userInfoCard";
 import { Badge } from "@/components/ui/badge";
-import { Attendance, CallStatusEnum } from "@prisma/client";
+import { CallStatusEnum } from "@prisma/client";
 import React from "react";
 
 type Props = {

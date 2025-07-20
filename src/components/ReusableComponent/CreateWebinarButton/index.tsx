@@ -12,9 +12,7 @@ import BasicInfoStep from "./BasicInfoStep";
 import CTAStep from "./CTAStep";
 import AdditionalInfoStep from "./AdditionalInfoStep";
 
-type Props = {};
-
-const CreateWebinarButton = (props: Props) => {
+const CreateWebinarButton = () => {
   const { isModalOpen, setIsModalOpen, isComplete, setIsComplete } =
     useWebinarStore();
   const [webinarLink, setWebinarLink] = useState("");

@@ -3,7 +3,6 @@
 import { prismaClient } from "@/lib/prismaClient";
 import { AttendanceData } from "@/lib/type";
 import { AttendedTypeEnum, CtaTypeEnum } from "@prisma/client";
-import { revalidatePath } from "next/cache";
 
 export const getWebinarAttendance = async (
   webinarId: string,

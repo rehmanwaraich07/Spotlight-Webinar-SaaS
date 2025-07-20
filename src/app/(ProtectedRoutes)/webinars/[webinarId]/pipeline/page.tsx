@@ -1,7 +1,7 @@
 import { getWebinarAttendance } from "@/actions/attendance";
 import PageHeader from "@/components/ReusableComponent/PageHeader";
 import { AttendedTypeEnum } from "@prisma/client";
-import { HomeIcon, Webcam } from "lucide-react";
+import { HomeIcon } from "lucide-react";
 import React from "react";
 import { FaUserGroup } from "react-icons/fa6";
 import { RiMenu3Line } from "react-icons/ri";

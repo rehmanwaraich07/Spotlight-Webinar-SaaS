@@ -6,9 +6,7 @@ import { useWebinarStore } from "@/store/useWebinarStore";
 import { Info } from "lucide-react";
 import React from "react";
 
-type Props = {};
-
-const AdditionalInfoStep = (props: Props) => {
+const AdditionalInfoStep = () => {
   const { formData, updateAdditionalInfoField, getStepValidationErrors } =
     useWebinarStore();
 

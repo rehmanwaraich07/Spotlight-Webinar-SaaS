@@ -7,9 +7,7 @@ import Image from "next/image";
 import { potentialCustomer } from "@/lib/data";
 import UserInfoCard from "@/components/ReusableComponent/userInfoCard";
 
-type Props = {};
-
-const Home = (props: Props) => {
+const Home = () => {
   return (
     <div className="w-full mx-auto h-full py-10">
       <div className="w-full flex flex-col sm:flex-row justify-between items-start gap-14">

@@ -7,9 +7,7 @@ import { CtaTypeEnum } from "@prisma/client";
 import { X } from "lucide-react";
 import React, { useState } from "react";
 
-type Props = {};
-
-const CTAStep = ({}: Props) => {
+const CTAStep = () => {
   const {
     formData,
     updateCtaField,

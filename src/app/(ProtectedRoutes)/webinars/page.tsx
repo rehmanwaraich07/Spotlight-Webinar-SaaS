@@ -9,9 +9,7 @@ import React from "react";
 import { FaUserGroup } from "react-icons/fa6";
 import WebinarCard from "./_components/WebinarCard";
 
-type Props = {};
-
-const Page = async (props: Props) => {
+const Page = async () => {
   const checkUser = await onAuthenticateUser();
   if (!checkUser) {
     redirect("/");
