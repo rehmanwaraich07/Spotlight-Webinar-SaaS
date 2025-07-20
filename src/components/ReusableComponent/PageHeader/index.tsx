@@ -3,6 +3,7 @@ import PurpleIcon from "../PurpleIcon";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
+// Add value and onChange to Props
 type Props = {
   heading?: string;
   leftIcon: React.ReactNode;
@@ -10,6 +11,8 @@ type Props = {
   rightIcon: React.ReactNode;
   children?: React.ReactNode;
   placeholder?: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 const PageHeader = ({
@@ -19,6 +22,8 @@ const PageHeader = ({
   placeholder,
   mainIcon,
   rightIcon,
+  value,
+  onChange,
 }: Props) => {
   return (
     <div className="flex flex-col w-full gap-8">
@@ -41,6 +46,8 @@ const PageHeader = ({
             className="pl-10 rounded-md"
             type="text"
             placeholder={placeholder || "Search ..."}
+            value={value}
+            onChange={onChange}
           />
         </div>
         <div className="md:max-w-1/4 w-full overflow-x-auto">{children}</div>

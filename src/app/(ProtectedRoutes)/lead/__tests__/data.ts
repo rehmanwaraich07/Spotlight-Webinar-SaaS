@@ -1,0 +1,98 @@
+export const leadData = [
+  {
+    name: "Jhon Joe",
+    email: "jhonjeo23@gmail.com",
+    phone: "+1-541-754-3010",
+    tags: ["Lead", "New", "Hot"],
+  },
+  {
+    name: "Alice Smith",
+    email: "alice.smith@outlook.com",
+    phone: "+1-202-555-0171",
+    tags: ["Lead", "Warm"],
+  },
+  {
+    name: "Bob Johnson",
+    email: "bob.johnson@outlook.com",
+    phone: "+1-202-555-0123",
+    tags: ["Prospect", "Cold"],
+  },
+  {
+    name: "Carol White",
+    email: "carol.white@outlook.com",
+    phone: "+1-202-555-0199",
+    tags: ["Lead", "Hot"],
+  },
+  {
+    name: "David Brown",
+    email: "david.brown@gmail.com",
+    phone: "+1-202-555-0147",
+    tags: ["Customer", "Returning"],
+  },
+  {
+    name: "Eve Black",
+    email: "eve.black@gmail.com",
+    phone: "+1-202-555-0188",
+    tags: ["Lead", "New"],
+  },
+  {
+    name: "Frank Green",
+    email: "frank.green@gmail.com",
+    phone: "+1-202-555-0133",
+    tags: ["Prospect", "Warm"],
+  },
+  {
+    name: "Grace Lee",
+    email: "grace.lee@businesstogo.com",
+    phone: "+1-202-555-0166",
+    tags: ["Lead", "Hot"],
+  },
+  {
+    name: "Henry King",
+    email: "henry.king@businesstogo.com",
+    phone: "+1-202-555-0155",
+    tags: ["Customer", "VIP"],
+  },
+  {
+    name: "Ivy Scott",
+    email: "ivy.scott@businesstogo.com",
+    phone: "+1-202-555-0111",
+    tags: ["Lead", "Cold"],
+  },
+  {
+    name: "Jack Turner",
+    email: "jack.turner@ukmountshop.com",
+    phone: "+1-202-555-0102",
+    tags: ["Prospect", "New"],
+  },
+  {
+    name: "Kathy Adams",
+    email: "kathy.adams@gmail.com",
+    phone: "+1-202-555-0190",
+    tags: ["Lead", "Warm"],
+  },
+  {
+    name: "Leo Baker",
+    email: "leo.baker@bikecountry.com",
+    phone: "+1-202-555-0181",
+    tags: ["Customer", "Returning"],
+  },
+  {
+    name: "Mona Clark",
+    email: "mona.clark@ukmountshop.com",
+    phone: "+1-202-555-0172",
+    tags: ["Lead", "Hot"],
+  },
+  {
+    name: "Nina Davis",
+    email: "nina.davis@proleaders.com",
+    phone: "+1-202-555-0134",
+    tags: ["Prospect", "Cold"],
+  },
+  {
+    name: "Oscar Evans",
+    email: "oscar.evans@proleaders.com",
+    phone: "+1-202-555-0125",
+    tags: ["Lead", "New"],
+  },
+];

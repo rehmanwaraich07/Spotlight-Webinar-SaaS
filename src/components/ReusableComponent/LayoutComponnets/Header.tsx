@@ -19,9 +19,9 @@ const Header = ({ user }: Props) => {
         <Button
           className="bg-primary/10 border border-border rounded-xl"
           variant={"outline"}
-          onClick={() => router.push("/webinar")}
+          onClick={() => router.push("/webinars")}
         >
-          <ArrowLeft /> back to Webinars
+          <ArrowLeft /> Back to Webinars
         </Button>
       ) : (
         <div className="px-4 py-2 flex justify-center font-bold items-center rounded-lg bg-background border border-border text-primary capitalize hover:bg-background/10">

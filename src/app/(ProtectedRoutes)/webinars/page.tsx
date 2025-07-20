@@ -32,7 +32,7 @@ const Page = async (props: Props) => {
         mainIcon={<Webcam className="w-12 h-12" />}
         rightIcon={<FaUserGroup className="w-4 h-4" />}
         heading="The home to all your webinars"
-        placeholder="Search option..."
+        placeholder="Search Webinars..."
       >
         <TabsList className="bg-transparent space-x-3">
           <TabsTrigger
