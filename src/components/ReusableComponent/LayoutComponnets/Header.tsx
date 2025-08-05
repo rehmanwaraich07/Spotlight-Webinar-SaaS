@@ -5,12 +5,14 @@ import { ArrowLeft, Zap } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import PurpleIcon from "../PurpleIcon";
 import CreateWebinarButton from "../CreateWebinarButton";
+import Stripe from "stripe";
 
 type Props = {
   user: User | null;
+  stripeProducts: Stripe.Product[] | [];
 };
 
-const Header = ({ user }: Props) => {
+const Header = ({ user, stripeProducts }: Props) => {
   const pathname = usePathname();
   const router = useRouter();
   return (
@@ -37,7 +39,7 @@ const Header = ({ user }: Props) => {
         {/* TODO: add the stripe subscription and create webinar button */}
         {/* TODO: {user.subscription ? "": ""} */}
 
-        <CreateWebinarButton />
+        <CreateWebinarButton stripeProducts={stripeProducts} />
       </div>
     </div>
   );

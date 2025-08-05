@@ -14,7 +14,6 @@ import React, { useState } from "react";
 import { FaUserGroup } from "react-icons/fa6";
 import { FaUser } from "react-icons/fa6";
 import { leadData } from "../__tests__/data";
-
 const LeadsPage = () => {
   const [search, setSearch] = useState("");
 
