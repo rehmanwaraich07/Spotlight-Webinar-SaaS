@@ -6,6 +6,8 @@ import { usePathname, useRouter } from "next/navigation";
 import PurpleIcon from "../PurpleIcon";
 import CreateWebinarButton from "../CreateWebinarButton";
 import Stripe from "stripe";
+import { StripeElements } from "../Stripe/Element";
+import SubscriptionModal from "../SubscriptionModal";
 
 type Props = {
   user: User | null;
@@ -37,9 +39,13 @@ const Header = ({ user, stripeProducts }: Props) => {
         </PurpleIcon>
 
         {/* TODO: add the stripe subscription and create webinar button */}
-        {/* TODO: {user.subscription ? "": ""} */}
-
-        <CreateWebinarButton stripeProducts={stripeProducts} />
+        {user?.subscription ? (
+          <CreateWebinarButton stripeProducts={stripeProducts} />
+        ) : (
+          <StripeElements>
+            <SubscriptionModal user={user} />
+          </StripeElements>
+        )}
       </div>
     </div>
   );
