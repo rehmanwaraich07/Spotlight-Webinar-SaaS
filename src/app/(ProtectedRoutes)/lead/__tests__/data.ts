@@ -96,3 +96,5 @@ export const leadData = [
     tags: ["Lead", "New"],
   },
 ];
+
+export const subscriptionPriceId = `price_1RvusR8RQb05a7lxCD4rh7WP`;

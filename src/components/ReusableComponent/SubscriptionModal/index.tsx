@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { User } from "@prisma/client";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { useElements, useStripe } from "@stripe/react-stripe-js";
+import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { Loader2, PlusIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -34,7 +34,38 @@ const SubscriptionModal = ({ user }: Props) => {
       }
 
       const intent = await onGetStripeClientSecret(user.email, user.id);
-    } catch (error) {}
+
+      if (!intent?.secret) {
+        throw new Error("Failed to initialize payment");
+      }
+
+      const cardElement = elements.getElement(CardElement);
+
+      if (!cardElement) {
+        throw new Error("Card Element not found");
+      }
+
+      const { error, paymentIntent } = await stripe.confirmCardPayment(
+        intent.secret,
+        {
+          payment_method: {
+            card: cardElement,
+          },
+        }
+      );
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      console.log("Payment Successful: ", paymentIntent);
+      router.refresh();
+    } catch (error) {
+      console.log("SUBSCRIPTION-->", error);
+      toast.error("Failed to Update Subscription");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -49,6 +80,20 @@ const SubscriptionModal = ({ user }: Props) => {
           <DialogHeader>
             <DialogTitle>Spotlight Suscription</DialogTitle>
           </DialogHeader>
+          <CardElement
+            options={{
+              style: {
+                base: {
+                  fontSize: "16px",
+                  color: "#B4B0AE",
+                  "::placeholder": {
+                    color: "#B4B0AE",
+                  },
+                },
+              },
+            }}
+            className="border-[1px] outline-none rounded-lg p-3 w-full"
+          />
           <DialogFooter className="gap-4 items-center">
             <DialogClose
               className="w-full sm:w-auto border border-border rounded-md px-3 py-2"

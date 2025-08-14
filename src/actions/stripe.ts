@@ -4,6 +4,7 @@ import { stripe } from "@/lib/stripe";
 import { onAuthenticateUser } from "./auth";
 import Stripe from "stripe";
 import { prismaClient } from "@/lib/prismaClient";
+import { subscriptionPriceId } from "@/lib/data";
 
 export const getAllProductsFromStripe = async () => {
   try {
@@ -82,6 +83,33 @@ export const onGetStripeClientSecret = async (
           userId: userId,
         },
       });
+
+      const paymentIntent = (subscription.latest_invoice as Stripe.Invoice)
+        .payment_intent as Stripe.PaymentIntent;
+
+      return {
+        status: 200,
+        secret: paymentIntent.client_secret,
+        customerId: customer.id,
+      };
     }
-  } catch (error) {}
+  } catch (error) {
+    console.error("Subscription creation error: ", error);
+    return { status: 400, mssage: "Failed to create subscription" };
+  }
+};
+
+export const updateSubscription = async (subscription: Stripe.Subscription) => {
+  try {
+    const userId = subscription.metadata.userId;
+
+    await prismaClient.user.update({
+      where: { id: userId },
+      data: {
+        subscription: subscription.status === "active" ? true : false,
+      },
+    });
+  } catch (error) {
+    console.log("Error in updating the Subscription: ", error);
+  }
 };

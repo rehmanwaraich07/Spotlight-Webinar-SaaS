@@ -43,7 +43,7 @@ const Header = ({ user, stripeProducts }: Props) => {
           <CreateWebinarButton stripeProducts={stripeProducts} />
         ) : (
           <StripeElements>
-            <SubscriptionModal user={user} />
+            {user && <SubscriptionModal user={user} />}
           </StripeElements>
         )}
       </div>
