@@ -142,3 +142,27 @@ export const getWebianrByPresenterId = async (presenterId: string) => {
     return [];
   }
 };
+
+export const getWebinarById = async (webinarId: string) => {
+  try {
+    const webinar = await prismaClient.webinar.findUnique({
+      where: {
+        id: webinarId,
+      },
+      include: {
+        presenter: {
+          select: {
+            id: true,
+            name: true,
+            profileImage: true,
+            stripeConnectId: true,
+          },
+        },
+      },
+    });
+    return webinar;
+  } catch (error) {
+    console.log("Error in fetching the WebinarId", error);
+    throw new Error("Failed to fetch the webianr");
+  }
+};

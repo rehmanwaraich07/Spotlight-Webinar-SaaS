@@ -97,4 +97,4 @@ export const leadData = [
   },
 ];
 
-export const subscriptionPriceId = `price_1RvusR8RQb05a7lxCD4rh7WP`;
+export const subscriptionPriceId = `price_1RwrTY8RQb05a7lxtEZon9Ll`;
