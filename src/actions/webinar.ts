@@ -4,6 +4,7 @@ import { WebinarFormState } from "@/store/useWebinarStore";
 import { onAuthenticateUser } from "./auth";
 import { revalidatePath } from "next/cache";
 import { prismaClient } from "@/lib/prismaClient";
+import { WebinarStatusEnum } from "@prisma/client";
 
 function combineDateTime(
   date: Date,
@@ -164,5 +165,35 @@ export const getWebinarById = async (webinarId: string) => {
   } catch (error) {
     console.log("Error in fetching the WebinarId", error);
     throw new Error("Failed to fetch the webianr");
+  }
+};
+
+export const changeWebinarStatus = async (
+  webinarId: string,
+  status: WebinarStatusEnum
+) => {
+  try {
+    const webinar = await prismaClient.webinar.update({
+      where: {
+        id: webinarId,
+      },
+      data: {
+        webinarStatus: status,
+      },
+    });
+
+    return {
+      status: 200,
+      success: true,
+      message: "Webinar Status Updated Successfully",
+      data: webinar,
+    };
+  } catch (error) {
+    console.log("Error Updating the webinar status: ", error);
+    return {
+      status: 500,
+      success: false,
+      message: "Failed to update the Webinar Status in Database",
+    };
   }
 };
