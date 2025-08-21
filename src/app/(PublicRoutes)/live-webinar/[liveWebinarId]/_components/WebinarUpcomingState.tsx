@@ -37,6 +37,8 @@ const WebinarUpcomingState = ({ webinar, currentUser }: Props) => {
         </div>
         {webinar.webinarStatus === WebinarStatusEnum.SCHEDULED ? (
           <WaitListComponent webinarId={webinar.id} webinarStatus="SCHEDULED" />
+        ) : webinar?.webinarStatus === WebinarStatusEnum.WAITING_ROOM ? (
+          ""
         ) : (
           ""
         )}

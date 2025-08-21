@@ -7,11 +7,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { WebinarStatusEnum } from "@prisma/client";
+import { CallStatusEnum, WebinarStatusEnum } from "@prisma/client";
 import React, { useState } from "react";
 import { registerAttendee } from "@/actions/webinar";
 import { useAttendeeStore } from "@/store/useAttendeeStore";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { Loader2 } from "lucide-react";
 
 type Props = {
   webinarId: string;
@@ -19,12 +22,17 @@ type Props = {
   onRegistered?: () => void;
 };
 
-const WaitListComponent = ({ webinarId, webinarStatus }: Props) => {
+const WaitListComponent = ({
+  webinarId,
+  webinarStatus,
+  onRegistered,
+}: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const router = useRouter();
 
   const { setAttendee } = useAttendeeStore();
 
@@ -48,7 +56,9 @@ const WaitListComponent = ({ webinarId, webinarStatus }: Props) => {
           id: res.data.user.id,
           name: res.data.user.name,
           email: res.data.user.email,
-          callStatus: "PENDING",
+          callStatus: CallStatusEnum.PENDING,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         });
       }
 
@@ -57,11 +67,27 @@ const WaitListComponent = ({ webinarId, webinarStatus }: Props) => {
           ? "Successfully joined the Webinar"
           : "Sucessfully registered for webinar"
       );
-
       setEmail("");
       setName("");
       setSubmitted(true);
-    } catch (error) {}
+
+      setTimeout(() => {
+        setIsOpen(false);
+
+        if (webinarStatus === WebinarStatusEnum.LIVE) {
+          router.refresh();
+        }
+
+        if (onRegistered) onRegistered();
+      }, 1500);
+    } catch (error) {
+      console.error("Error submitting waitlist form: ", error);
+      toast.error(
+        error instanceof Error ? error.message : "Something went wrong"
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const buttonText = () => {
@@ -105,10 +131,50 @@ const WaitListComponent = ({ webinarId, webinarStatus }: Props) => {
               ? "Join the Webinar"
               : "Join the Waitlist"}
           </DialogTitle>
-          <form
-            onSubmit={handleSubmit}
-            className="flex flex-col gap-4 w-full"
-          ></form>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
+            {!submitted && (
+              <React.Fragment>
+                <Input
+                  type="text"
+                  placeholder="Your Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+                <Input
+                  type="email"
+                  value={email}
+                  placeholder="Your Email"
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isSubmitting || submitted}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="animate-spin mr-2" />
+                      {webinarStatus === WebinarStatusEnum.LIVE
+                        ? "Joining..."
+                        : "Registering..."}
+                    </>
+                  ) : submitted ? (
+                    webinarStatus === WebinarStatusEnum.LIVE ? (
+                      "You're all set to join!"
+                    ) : (
+                      "You've successfully joined the waitlist!"
+                    )
+                  ) : webinarStatus === WebinarStatusEnum.LIVE ? (
+                    "Join Now"
+                  ) : (
+                    "Join Waitlist"
+                  )}
+                </Button>
+              </React.Fragment>
+            )}
+          </form>
         </DialogHeader>
       </DialogContent>
     </Dialog>
