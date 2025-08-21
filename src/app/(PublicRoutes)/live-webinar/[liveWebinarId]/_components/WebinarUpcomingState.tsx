@@ -3,6 +3,7 @@ import { User, Webinar, WebinarStatusEnum } from "@prisma/client";
 import React, { useState } from "react";
 import CountdownTimer from "./UpcomingWebinar/CountdownTimer";
 import Image from "next/image";
+import WaitListComponent from "./WaitListComponent";
 
 type Props = {
   webinar: Webinar;

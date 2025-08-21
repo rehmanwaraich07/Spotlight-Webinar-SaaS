@@ -4,7 +4,7 @@ import { WebinarFormState } from "@/store/useWebinarStore";
 import { onAuthenticateUser } from "./auth";
 import { revalidatePath } from "next/cache";
 import { prismaClient } from "@/lib/prismaClient";
-import { WebinarStatusEnum } from "@prisma/client";
+import { AttendedTypeEnum, WebinarStatusEnum } from "@prisma/client";
 
 function combineDateTime(
   date: Date,
@@ -194,6 +194,104 @@ export const changeWebinarStatus = async (
       status: 500,
       success: false,
       message: "Failed to update the Webinar Status in Database",
+    };
+  }
+};
+
+export const registerAttendee = async ({
+  webinarId,
+  email,
+  name,
+}: {
+  webinarId: string;
+  email: string;
+  name: string;
+}) => {
+  try {
+    if (!webinarId || !email) {
+      return {
+        success: false,
+        status: 400,
+        meessage: "Missing Required Parameters",
+      };
+    }
+
+    const webinar = await prismaClient.webinar.findUnique({
+      where: { id: webinarId },
+    });
+
+    if (!webinar) {
+      return {
+        success: false,
+        status: 404,
+        message: "Webinar not Found",
+      };
+    }
+
+    let attendee = await prismaClient.attendee.findUnique({
+      where: { email },
+    });
+
+    if (!attendee) {
+      attendee = await prismaClient.attendee.create({
+        data: { email, name },
+      });
+    }
+
+    if (!attendee) {
+      return {
+        success: false,
+        status: 500,
+        message: "Failed to resolve attendee",
+      };
+    }
+
+    // check for existing attendance
+
+    const existingAttendance = await prismaClient.attendance.findFirst({
+      where: {
+        attendeeId: attendee?.id,
+        webinarId: webinar.id,
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    if (existingAttendance) {
+      return {
+        success: true,
+        status: 200,
+        data: existingAttendance,
+        message: "You are already registered for this webinar",
+      };
+    }
+
+    const attendance = await prismaClient.attendance.create({
+      data: {
+        attendedType: AttendedTypeEnum.REGISTERED,
+        attendeeId: attendee.id,
+        webinarId: webinarId,
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    revalidatePath(`/${webinarId}`);
+
+    return {
+      success: true,
+      status: 200,
+      data: attendance,
+      meessage: "Successfully Registered",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      status: 500,
+      error: error,
+      message: "Something went wrong",
     };
   }
 };
