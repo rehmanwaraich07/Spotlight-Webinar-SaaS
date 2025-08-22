@@ -113,7 +113,7 @@ const WaitListComponent = ({
             webinarStatus === WebinarStatusEnum.LIVE
               ? "bg-red-600 hover:bg-red-700"
               : "bg-primary hover:bg-primary/90"
-          } rounded-md px-4 py-2 text-primary-foreground text-sm font-semibold`}
+          } rounded-md px-4 py-2 text-primary-foreground text-sm font-semibold cursor-pointer`}
         >
           {webinarStatus === WebinarStatusEnum.LIVE && (
             <span className="mr-2 h-2 w-2  bg-white rounded-full animate-pulse"></span>
@@ -150,7 +150,7 @@ const WaitListComponent = ({
                 />
                 <Button
                   type="submit"
-                  className="w-full"
+                  className="w-full cursor-pointer"
                   disabled={isSubmitting || submitted}
                 >
                   {isSubmitting ? (
