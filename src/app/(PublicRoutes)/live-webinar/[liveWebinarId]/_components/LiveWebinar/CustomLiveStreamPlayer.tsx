@@ -50,9 +50,9 @@ const CustomLiveStreamPlayer = ({
         setShowChat={setShowChat}
         isHost={true}
         username={username}
-        userId={process.env.NEXT_PUBLIC_STREAM_USER_ID!}
         userToken={token}
         webinar={webinar}
+        userId={process.env.NEXT_PUBLIC_STREAM_USER_ID!}
       />
     </StreamCall>
   );

@@ -30,65 +30,13 @@ const LiveWebinarView = ({
   const [chatClient, setChatClient] = useState<StreamChat | null>(null);
   const [channel, setChannel] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [isChatInitialized, setIsChatInitialized] = useState(false);
 
   const { useParticipantCount, useParticipants } = useCallStateHooks();
   const participants = useParticipants();
   const viewerCount = useParticipantCount();
   const hostParticipant = participants.length > 0 ? participants[0] : null;
 
-  const handleCTAButtonClick = async () => {
-    if (!channel) return;
-
-    console.log("CTA button clicked", channel);
-    await channel.sendEvent({
-      type: "open_cta_dialog",
-    });
-  };
-
-  useEffect(() => {
-    const initChat = async () => {
-      try {
-        const client = StreamChat.getInstance(
-          process.env.NEXT_PUBLIC_STREAM_API_KEY!
-        );
-
-        await client.connectUser(
-          {
-            id: userId,
-            name: username,
-          },
-          userToken
-        );
-
-        const channel = client.channel("livestream", webinar.id);
-
-        await channel.watch();
-        setChatClient(client);
-        setChannel(channel);
-        setIsChatInitialized(true);
-      } catch (error) {
-        console.error("Failed to initialize chat:", error);
-      }
-    };
-
-    initChat();
-    return () => {
-      if (chatClient) {
-        chatClient.disconnectUser();
-      }
-    };
-  }, [userId, username, userToken, webinar.id]);
-
-  useEffect(() => {
-    if (chatClient && channel) {
-      channel.on((event: any) => {
-        if (event.type === "open_cta_dialog" && !isHost) {
-          setDialogOpen(true);
-        }
-      });
-    }
-  }, [channel, chatClient, isHost]);
+  // TODO: Rebuild the useEffect
 
   //   if (!chatClient || !channel) return null;
   return (
@@ -171,7 +119,7 @@ const LiveWebinarView = ({
           </div>
         </div>
 
-        {showChat && isChatInitialized && chatClient && channel && (
+        {showChat && chatClient && channel && (
           <>
             <Chat client={chatClient}>
               <Channel channel={channel}>
