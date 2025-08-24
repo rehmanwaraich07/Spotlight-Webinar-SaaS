@@ -5,6 +5,7 @@ import WebinarUpcomingState from "../WebinarUpcomingState";
 import { usePathname, useRouter } from "next/navigation";
 import { useAttendeeStore } from "@/store/useAttendeeStore";
 import { toast } from "sonner";
+import LiveStreamState from "../LiveWebinar/LiveStreamState";
 
 type Props = {
   apikey: string;
@@ -44,8 +45,13 @@ const RenderWebinar = ({
         // "TODO: // Live Componenet"
         <React.Fragment>
           {user?.id === webinar.presenterId ? (
-            // <LiveStreamState apikey={apikey} callId={callId} token={token} />
-            "Livestream for presenter"
+            <LiveStreamState
+              apikey={apikey}
+              callId={callId}
+              token={token}
+              webinar={webinar}
+              user={user}
+            />
           ) : attendee ? (
             // <Participant apikey={apikey} token={token} callId={callId} /> // only show participant that have registered for the webinar
             "Live for participant"
