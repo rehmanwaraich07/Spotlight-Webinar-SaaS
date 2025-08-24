@@ -1,6 +1,7 @@
+import { Chat, Channel, MessageList, MessageInput } from "stream-chat-react";
+import "stream-chat-react/css/v2/index.css";
 import { StreamChat } from "stream-chat";
 import { WebinarWithPresenter } from "@/lib/type";
-import { MessageSquare } from "lucide-react";
 import { ParticipantView, useCallStateHooks } from "@stream-io/video-react-sdk";
 import React, { useEffect, useState } from "react";
 import { HiUsers } from "react-icons/hi2";
@@ -29,26 +30,55 @@ const LiveWebinarView = ({
   const [chatClient, setChatClient] = useState<StreamChat | null>(null);
   const [channel, setChannel] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isChatInitialized, setIsChatInitialized] = useState(false);
+
   const { useParticipantCount, useParticipants } = useCallStateHooks();
   const participants = useParticipants();
   const viewerCount = useParticipantCount();
   const hostParticipant = participants.length > 0 ? participants[0] : null;
 
+  const handleCTAButtonClick = async () => {
+    if (!channel) return;
+
+    console.log("CTA button clicked", channel);
+    await channel.sendEvent({
+      type: "open_cta_dialog",
+    });
+  };
+
   useEffect(() => {
     const initChat = async () => {
-      const client = StreamChat.getInstance(
-        process.env.NEXT_PUBLIC_STREAM_API_KEY!
-      );
+      try {
+        const client = StreamChat.getInstance(
+          process.env.NEXT_PUBLIC_STREAM_API_KEY!
+        );
 
-      await client.connectUser(
-        {
-          id: userId,
-          name: username,
-        },
-        userToken
-      );
+        await client.connectUser(
+          {
+            id: userId,
+            name: username,
+          },
+          userToken
+        );
+
+        const channel = client.channel("livestream", webinar.id);
+
+        await channel.watch();
+        setChatClient(client);
+        setChannel(channel);
+        setIsChatInitialized(true);
+      } catch (error) {
+        console.error("Failed to initialize chat:", error);
+      }
     };
-  }, [userId, username, userToken, webinar.id, webinar.title]);
+
+    initChat();
+    return () => {
+      if (chatClient) {
+        chatClient.disconnectUser();
+      }
+    };
+  }, [userId, username, userToken, webinar.id]);
 
   useEffect(() => {
     if (chatClient && channel) {
@@ -60,7 +90,7 @@ const LiveWebinarView = ({
     }
   }, [channel, chatClient, isHost]);
 
-  if (!chatClient || !channel) return null;
+  //   if (!chatClient || !channel) return null;
   return (
     <div className="flex flex-col w-full h-screen max-h-screen overflow-hidden bg-background text-primary">
       <div className="py-2 px-2 border-b border-border flex items-center justify-between">
@@ -128,7 +158,10 @@ const LiveWebinarView = ({
 
             {isHost && (
               <div className="flex items-center space-x-1">
-                <Button onClick={handleCTAButtonClick}>
+                <Button
+                  onClick={handleCTAButtonClick}
+                  className="cursor-pointer"
+                >
                   {webinar.ctaType === CtaTypeEnum.BOOK_A_CALL
                     ? "Book a Call"
                     : "Buy Now"}
@@ -137,7 +170,39 @@ const LiveWebinarView = ({
             )}
           </div>
         </div>
+
+        {showChat && isChatInitialized && chatClient && channel && (
+          <>
+            <Chat client={chatClient}>
+              <Channel channel={channel}>
+                <div className="w-72 bg-card border border-border rounded-lg overflow-hidden flex flex-col">
+                  <div className="py-2 px-3 border-b border-border font-medium flex items-center justify-between">
+                    <span>Chat</span>
+                    <span className="text-xs bg-muted px-2 py-0.5 rounded-full">
+                      {viewerCount} viewers
+                    </span>
+                  </div>
+
+                  <MessageList />
+
+                  <div className="p-2 border-t border-border">
+                    <MessageInput />
+                  </div>
+                </div>
+              </Channel>
+            </Chat>
+          </>
+        )}
       </div>
+
+      {dialogOpen &&
+        // <CTADialogBox
+        //   open={dialogOpen}
+        //   onOpenChange={setDialogOpen}
+        //   webinar={webinar}
+        //   userId={userId}
+        // />
+        ""}
     </div>
   );
 };
