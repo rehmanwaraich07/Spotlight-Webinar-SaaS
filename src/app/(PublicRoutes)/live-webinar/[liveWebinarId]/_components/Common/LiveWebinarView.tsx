@@ -2,9 +2,11 @@ import { StreamChat } from "stream-chat";
 import { WebinarWithPresenter } from "@/lib/type";
 import { MessageSquare } from "lucide-react";
 import { ParticipantView, useCallStateHooks } from "@stream-io/video-react-sdk";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { HiUsers } from "react-icons/hi2";
 import { AiFillMessage } from "react-icons/ai";
+import { Button } from "@/components/ui/button";
+import { CtaTypeEnum } from "@prisma/client";
 type Props = {
   showChat: boolean;
   setShowChat: (show: boolean) => void;
@@ -31,6 +33,34 @@ const LiveWebinarView = ({
   const participants = useParticipants();
   const viewerCount = useParticipantCount();
   const hostParticipant = participants.length > 0 ? participants[0] : null;
+
+  useEffect(() => {
+    const initChat = async () => {
+      const client = StreamChat.getInstance(
+        process.env.NEXT_PUBLIC_STREAM_API_KEY!
+      );
+
+      await client.connectUser(
+        {
+          id: userId,
+          name: username,
+        },
+        userToken
+      );
+    };
+  }, [userId, username, userToken, webinar.id, webinar.title]);
+
+  useEffect(() => {
+    if (chatClient && channel) {
+      channel.on((event: any) => {
+        if (event.type === "open_cta_dialog" && !isHost) {
+          setDialogOpen(true);
+        }
+      });
+    }
+  }, [channel, chatClient, isHost]);
+
+  if (!chatClient || !channel) return null;
   return (
     <div className="flex flex-col w-full h-screen max-h-screen overflow-hidden bg-background text-primary">
       <div className="py-2 px-2 border-b border-border flex items-center justify-between">
@@ -89,7 +119,23 @@ const LiveWebinarView = ({
             )}
           </div>
 
-          <div className=""></div>
+          <div className="p-2 border-t border-border flex items-center justify-between py-2">
+            <div className="flex items-center space-x-2">
+              <div className="text-sm font-medium capitalize">
+                {webinar.title}
+              </div>
+            </div>
+
+            {isHost && (
+              <div className="flex items-center space-x-1">
+                <Button onClick={handleCTAButtonClick}>
+                  {webinar.ctaType === CtaTypeEnum.BOOK_A_CALL
+                    ? "Book a Call"
+                    : "Buy Now"}
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
