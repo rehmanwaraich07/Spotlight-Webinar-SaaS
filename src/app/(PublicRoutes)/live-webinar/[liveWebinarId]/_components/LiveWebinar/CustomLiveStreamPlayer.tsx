@@ -1,7 +1,12 @@
 "use client";
-import { useStreamVideoClient, Call } from "@stream-io/video-react-sdk";
+import {
+  useStreamVideoClient,
+  Call,
+  StreamCall,
+} from "@stream-io/video-react-sdk";
 import { WebinarWithPresenter } from "@/lib/type";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import LiveWebinarView from "../Common/LiveWebinarView";
 
 type Props = {
   username: string;
@@ -21,7 +26,36 @@ const CustomLiveStreamPlayer = ({
   const client = useStreamVideoClient();
   const [call, setCall] = useState<Call>();
   const [showChat, setShowChat] = useState(true);
-  return <div>CustomLiveStreamPlayer</div>;
+
+  useEffect(() => {
+    if (!client) return;
+    const myCall = client.call(callType, callId);
+    setCall(myCall);
+    myCall.join().catch((e) => {
+      console.log("Failed to Join the call ", e);
+    });
+
+    return () => {
+      myCall.leave().catch((e) => {
+        console.error("Failed to Leave Call ", e);
+      });
+      setCall(undefined);
+    };
+  }, [client, callId, callType]);
+  if (!call) return null;
+  return (
+    <StreamCall call={call}>
+      <LiveWebinarView
+        showChat={showChat}
+        setShowChat={setShowChat}
+        isHost={true}
+        username={username}
+        userId={process.env.NEXT_PUBLIC_STREAM_USER_ID!}
+        userToken={token}
+        webinar={webinar}
+      />
+    </StreamCall>
+  );
 };
 
 export default CustomLiveStreamPlayer;
