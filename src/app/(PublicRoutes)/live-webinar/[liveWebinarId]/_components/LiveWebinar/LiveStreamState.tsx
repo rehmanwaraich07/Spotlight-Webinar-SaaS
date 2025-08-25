@@ -17,7 +17,6 @@ type Props = {
 };
 
 const LiveStreamState = ({ apiKey, token, callId, user, webinar }: Props) => {
-  // Create Stream user object from the actual user data
   const streamUser: StreamUser = {
     id: user.id,
     name: user.name || "Unknown User",

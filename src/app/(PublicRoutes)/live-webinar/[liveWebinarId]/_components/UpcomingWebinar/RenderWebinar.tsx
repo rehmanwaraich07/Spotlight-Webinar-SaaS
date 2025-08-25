@@ -1,5 +1,5 @@
 "use client";
-import { User, Webinar, WebinarStatusEnum } from "@prisma/client";
+import { User, WebinarStatusEnum } from "@prisma/client";
 import React, { useEffect } from "react";
 import WebinarUpcomingState from "../WebinarUpcomingState";
 import { usePathname, useRouter } from "next/navigation";

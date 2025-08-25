@@ -196,14 +196,14 @@ const LiveWebinarView = ({
         )}
       </div>
 
-      {dialogOpen &&
-        // <CTADialogBox
-        //   open={dialogOpen}
-        //   onOpenChange={setDialogOpen}
-        //   webinar={webinar}
-        //   userId={userId}
-        // />
-        ""}
+      {dialogOpen && (
+        <CTADialogBox
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          webinar={webinar}
+          userId={userId}
+        />
+      )}
     </div>
   );
 };
