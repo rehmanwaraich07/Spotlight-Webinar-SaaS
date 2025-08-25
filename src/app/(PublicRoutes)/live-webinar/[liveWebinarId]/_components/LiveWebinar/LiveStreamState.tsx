@@ -16,10 +16,15 @@ type Props = {
   webinar: WebinarWithPresenter;
 };
 
-const hostUser: StreamUser = { id: process.env.NEXT_PUBLIC_STREAM_USER_ID! };
-
 const LiveStreamState = ({ apiKey, token, callId, user, webinar }: Props) => {
-  const client = new StreamVideoClient({ apiKey, user: hostUser, token });
+  // Create Stream user object from the actual user data
+  const streamUser: StreamUser = {
+    id: user.id,
+    name: user.name || "Unknown User",
+    image: user.profileImage || undefined,
+  };
+
+  const client = new StreamVideoClient({ apiKey, user: streamUser, token });
 
   return (
     <StreamVideo client={client}>
@@ -27,8 +32,9 @@ const LiveStreamState = ({ apiKey, token, callId, user, webinar }: Props) => {
         callId={callId}
         callType={"livestream"}
         webinar={webinar}
-        username={user.name}
+        username={user.name || "Unknown User"}
         token={token}
+        userId={user.id}
       />
     </StreamVideo>
   );

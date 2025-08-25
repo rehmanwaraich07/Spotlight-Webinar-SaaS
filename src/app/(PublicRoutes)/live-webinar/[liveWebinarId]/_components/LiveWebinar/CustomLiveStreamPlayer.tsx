@@ -14,6 +14,7 @@ type Props = {
   callType: string;
   webinar: WebinarWithPresenter;
   token: string;
+  userId: string;
 };
 
 const CustomLiveStreamPlayer = ({
@@ -22,6 +23,7 @@ const CustomLiveStreamPlayer = ({
   callType,
   webinar,
   token,
+  userId,
 }: Props) => {
   const client = useStreamVideoClient();
   const [call, setCall] = useState<Call>();
@@ -52,7 +54,7 @@ const CustomLiveStreamPlayer = ({
         username={username}
         userToken={token}
         webinar={webinar}
-        userId={process.env.NEXT_PUBLIC_STREAM_USER_ID!}
+        userId={userId}
       />
     </StreamCall>
   );

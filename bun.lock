@@ -35,6 +35,8 @@
         "@radix-ui/react-tooltip": "^1.2.7",
         "@stream-io/node-sdk": "0.4.23",
         "@stream-io/video-react-sdk": "1.14.6",
+        "@stripe/react-stripe-js": "^3.9.1",
+        "@stripe/stripe-js": "^7.8.0",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "cmdk": "^1.1.1",
@@ -396,6 +398,10 @@
     "@stream-io/video-react-bindings": ["@stream-io/video-react-bindings@1.5.18", "", { "dependencies": { "i18next": "^23.5.1", "rxjs": "~7.8.1" }, "peerDependencies": { "@stream-io/video-client": "^1.20.2", "react": "^17 || ^18 || ^19" } }, "sha512-NonFO5wuYJfd08FekWLu77AXaHAI45SxHjb5cngzuzqY2bVMlnb1NOmIniWBK2P4i4t/4EkPqDlz5uidafnuhQ=="],
 
     "@stream-io/video-react-sdk": ["@stream-io/video-react-sdk@1.14.6", "", { "dependencies": { "@floating-ui/react": "^0.27.6", "@stream-io/video-client": "1.20.2", "@stream-io/video-filters-web": "0.1.7", "@stream-io/video-react-bindings": "1.5.18", "chart.js": "^4.4.4", "clsx": "^2.0.0", "react-chartjs-2": "^5.3.0" }, "peerDependencies": { "react": "^17 || ^18 || ^19", "react-dom": "^17 || ^18 || ^19" } }, "sha512-flolgAD6WQgE09GtKAbSwamuc5vEE1HhV4kPyKEp81VuE0lbgtDiii3f89AjyKGO85Gq+untiiCMHPbyn9UZOg=="],
+
+    "@stripe/react-stripe-js": ["@stripe/react-stripe-js@3.9.1", "", { "dependencies": { "prop-types": "^15.7.2" }, "peerDependencies": { "@stripe/stripe-js": ">=1.44.1 <8.0.0", "react": ">=16.8.0 <20.0.0", "react-dom": ">=16.8.0 <20.0.0" } }, "sha512-t5KZiu7jkUTHOx0adGSlSj4xPpFSvW6BsgIRQHNXqhHeYBH0mpddVUZsO33WM1m6Vyd1Wl96JoBhwEsw8jMHTQ=="],
+
+    "@stripe/stripe-js": ["@stripe/stripe-js@7.8.0", "", {}, "sha512-DNXRfYUgkZlrniQORbA/wH8CdFRhiBSE0R56gYU0V5vvpJ9WZwvGrz9tBAZmfq2aTgw6SK7mNpmTizGzLWVezw=="],
 
     "@swc/counter": ["@swc/counter@0.1.3", "", {}, "sha512-e2BR4lsJkkRlKZ/qCHPw9ZaSxc0MVUd7gtbtaB7aMvHeJVYe8sOB8DBZkP2DtISHGSku9sCK6T6cnY0CtXrOCQ=="],
 

@@ -40,6 +40,8 @@
     "@radix-ui/react-tooltip": "^1.2.7",
     "@stream-io/node-sdk": "0.4.23",
     "@stream-io/video-react-sdk": "1.14.6",
+    "@stripe/react-stripe-js": "^3.9.1",
+    "@stripe/stripe-js": "^7.8.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

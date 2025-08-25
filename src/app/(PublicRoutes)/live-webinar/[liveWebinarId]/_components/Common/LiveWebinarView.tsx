@@ -3,11 +3,12 @@ import "stream-chat-react/css/v2/index.css";
 import { StreamChat } from "stream-chat";
 import { WebinarWithPresenter } from "@/lib/type";
 import { ParticipantView, useCallStateHooks } from "@stream-io/video-react-sdk";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { HiUsers } from "react-icons/hi2";
 import { AiFillMessage } from "react-icons/ai";
 import { Button } from "@/components/ui/button";
 import { CtaTypeEnum } from "@prisma/client";
+
 type Props = {
   showChat: boolean;
   setShowChat: (show: boolean) => void;
@@ -36,7 +37,59 @@ const LiveWebinarView = ({
   const viewerCount = useParticipantCount();
   const hostParticipant = participants.length > 0 ? participants[0] : null;
 
-  // TODO: Rebuild the useEffect
+  const handleCTAButtonClick = async () => {
+    if (!channel) {
+      console.log("Channel not Found");
+      return;
+    }
+    console.log("CTA channel button clicked: ", channel);
+    await channel.sendEvent({
+      type: "open_cta_dialog",
+    });
+  };
+
+  useEffect(() => {
+    const initChat = async () => {
+      const client = StreamChat.getInstance(
+        process.env.NEXT_PUBLIC_STREAM_API_KEY!
+      );
+
+      await client.connectUser(
+        {
+          id: userId,
+          name: username,
+        },
+        userToken
+      );
+
+      const channel = client.channel("livestream", webinar.id, {
+        name: webinar.title,
+      });
+
+      await channel.watch();
+
+      setChatClient(client);
+      setChannel(channel);
+    };
+
+    initChat();
+
+    return () => {
+      if (chatClient) {
+        chatClient.disconnectUser();
+      }
+    };
+  }, [userId, username, userToken, webinar.id, webinar.title]);
+
+  useEffect(() => {
+    if (chatClient && channel) {
+      channel.on((event: any) => {
+        if (event.type === "open_cta_dialog" && !isHost) {
+          setDialogOpen(true);
+        }
+      });
+    }
+  }, [chatClient, channel, isHost]);
 
   //   if (!chatClient || !channel) return null;
   return (
@@ -119,7 +172,7 @@ const LiveWebinarView = ({
           </div>
         </div>
 
-        {showChat && chatClient && channel && (
+        {showChat && chatClient && (
           <>
             <Chat client={chatClient}>
               <Channel channel={channel}>

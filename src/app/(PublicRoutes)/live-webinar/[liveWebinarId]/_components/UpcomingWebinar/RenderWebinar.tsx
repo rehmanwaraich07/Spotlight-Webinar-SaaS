@@ -57,10 +57,7 @@ const RenderWebinar = ({
             // <Participant apikey={apikey} token={token} callId={callId} /> // only show participant that have registered for the webinar
             "Live for participant"
           ) : (
-            <WebinarUpcomingState
-              webinar={webinar}
-              currentUser={user || null}
-            />
+            <WebinarUpcomingState webinar={webinar} currentUser={user} />
           )}
         </React.Fragment>
       ) : webinar.webinarStatus === WebinarStatusEnum.CANCELLED ? (
