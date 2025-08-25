@@ -8,6 +8,7 @@ import { HiUsers } from "react-icons/hi2";
 import { AiFillMessage } from "react-icons/ai";
 import { Button } from "@/components/ui/button";
 import { CtaTypeEnum } from "@prisma/client";
+import CTADialogBox from "./CTADialogBox";
 
 type Props = {
   showChat: boolean;
@@ -38,14 +39,18 @@ const LiveWebinarView = ({
   const hostParticipant = participants.length > 0 ? participants[0] : null;
 
   const handleCTAButtonClick = async () => {
-    if (!channel) {
+    if (isHost) {
+      // For hosts, directly open the modal
+      setDialogOpen(true);
+    } else if (channel) {
+      // For participants, send event to host
+      console.log("CTA channel button clicked: ", channel);
+      await channel.sendEvent({
+        type: "open_cta_dialog",
+      });
+    } else {
       console.log("Channel not Found");
-      return;
     }
-    console.log("CTA channel button clicked: ", channel);
-    await channel.sendEvent({
-      type: "open_cta_dialog",
-    });
   };
 
   useEffect(() => {

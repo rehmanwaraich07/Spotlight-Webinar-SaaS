@@ -5,6 +5,8 @@ import { onAuthenticateUser } from "./auth";
 import Stripe from "stripe";
 import { prismaClient } from "@/lib/prismaClient";
 import { subscriptionPriceId } from "@/lib/data";
+import { changeAttendanceType } from "./attendance";
+import { toast } from "sonner";
 
 export const getAllProductsFromStripe = async () => {
   try {
@@ -111,5 +113,54 @@ export const updateSubscription = async (subscription: Stripe.Subscription) => {
     });
   } catch (error) {
     console.log("Error in updating the Subscription: ", error);
+  }
+};
+
+export const createCheckoutLink = async (
+  priceId: string,
+  stripeId: string,
+  attendeeId: string,
+  webinarId: string,
+  bookCall: boolean = false
+) => {
+  try {
+    const session = await stripe.checkout.sessions.create(
+      {
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        mode: "payment",
+        success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/`,
+        cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/`,
+        metadata: {
+          attendeeId: attendeeId,
+          webinarId: webinarId,
+        },
+      },
+      {
+        stripeAccount: stripeId,
+      }
+    );
+
+    if (bookCall) {
+      await changeAttendanceType(attendeeId, webinarId, "ADDED_TO_CART");
+    }
+
+    return {
+      sessionUrl: session.url,
+      success: true,
+      status: 200,
+    };
+  } catch (error) {
+    toast.error("Error in creating Checkout Link");
+    console.error("Error creating chcekout link: ", error);
+    return {
+      error: "Error creating the checkout link",
+      status: 500,
+      success: false,
+    };
   }
 };
