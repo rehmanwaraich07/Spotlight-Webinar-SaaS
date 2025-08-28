@@ -26,6 +26,7 @@ const CTAStep = ({ stripeProducts }: Props) => {
     addTag,
     removeTag,
     getStepValidationErrors,
+    showErrors,
   } = useWebinarStore();
 
   const errors = getStepValidationErrors("cta");
@@ -58,7 +59,7 @@ const CTAStep = ({ stripeProducts }: Props) => {
       <div className="space-y-2">
         <Label
           htmlFor="ctaLabel"
-          className={errors.ctaLabel ? "text-red-400" : ""}
+          className={showErrors.cta && errors.ctaLabel ? "text-red-400" : ""}
         >
           CTA Label <span className="text-red-400">*</span>
         </Label>
@@ -70,10 +71,12 @@ const CTAStep = ({ stripeProducts }: Props) => {
           placeholder="Let's Get Started"
           className={cn(
             "!bg-background/50 border border-input",
-            errors.ctaLabel && "border-red-400 focus-visible:ring-red-400"
+            showErrors.cta &&
+              errors.ctaLabel &&
+              "border-red-400 focus-visible:ring-red-400"
           )}
         />
-        {errors.ctaLabel && (
+        {showErrors.cta && errors.ctaLabel && (
           <p className="text-sm text-red-400">{errors.ctaLabel}</p>
         )}
       </div>
@@ -111,17 +114,17 @@ const CTAStep = ({ stripeProducts }: Props) => {
       <div className="space-y-2 w-full">
         <Label>CTA Type</Label>
         <Tabs defaultValue={CtaTypeEnum.BOOK_A_CALL} className="w-full">
-          <TabsList className="w-full bg-transparent">
+          <TabsList className="w-full bg-transparent grid grid-cols-2 gap-2">
             <TabsTrigger
               value={CtaTypeEnum.BOOK_A_CALL}
-              className="w-1/2 data-[state=active]:bg-background/50"
+              className="w-full data-[state=active]:bg-background/50"
               onClick={() => handleSelectCTAType(CtaTypeEnum.BOOK_A_CALL)}
             >
               Book a Call
             </TabsTrigger>
             <TabsTrigger
               value={CtaTypeEnum.BUY_NOW}
-              className="w-1/2"
+              className="w-full"
               onClick={() => handleSelectCTAType(CtaTypeEnum.BUY_NOW)}
             >
               Buy Now

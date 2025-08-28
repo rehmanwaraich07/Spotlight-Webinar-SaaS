@@ -19,13 +19,18 @@ type Props = {
 
 const PipelineLayout = ({ title, count, users, tags }: Props) => {
   return (
-    <div className="flex shrink-0 w-[350px] p-5 border border-border bg-background/10 rounded-xl backdrop-blur-2xl">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="font-medium">{title}</h2>
+    <div className="flex flex-col w-full p-4 md:p-5 border border-border/60 bg-background/60 rounded-xl backdrop-blur supports-[backdrop-filter]:bg-background/50 shadow-sm transition-shadow hover:shadow-md">
+      <div className="flex items-center justify-between mb-3 md:mb-4">
+        <h2
+          className="text-sm md:text-base font-semibold truncate pr-3"
+          title={title}
+        >
+          {title}
+        </h2>
         <Badge variant={"secondary"}>{count}</Badge>
       </div>
 
-      <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-2 scrollbar-hide">
+      <div className="space-y-3 md:space-y-4 max-h-[70vh] overflow-y-auto pr-1 md:pr-2 scrollbar-hide">
         {users.map((user, index) => (
           <UserInfoCard key={index} customer={user} tags={tags} />
         ))}

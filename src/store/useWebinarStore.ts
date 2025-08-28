@@ -44,16 +44,24 @@ type ValidationState = {
   };
 };
 
+type ShowErrorsState = {
+  basicInfo: boolean;
+  cta: boolean;
+  additionalInfo: boolean;
+};
+
 type WebinarStore = {
   isModalOpen: boolean;
   isComplete: boolean;
   isSubmitting: boolean;
   formData: WebinarFormState;
   validation: ValidationState;
+  showErrors: ShowErrorsState;
 
   setIsModalOpen: (value: boolean) => void;
   setIsComplete: (value: boolean) => void;
   setIsSubmitting: (value: boolean) => void;
+  setShowErrorsForStep: (stepId: keyof WebinarFormState, show: boolean) => void;
   updateBasicInfoField: <K extends keyof WebinarFormState["basicInfo"]>(
     field: K,
     value: WebinarFormState["basicInfo"][K]
@@ -109,16 +117,25 @@ const initialValidation: ValidationState = {
   additionalInfo: { valid: false, errors: {} },
 };
 
+const initialShowErrors: ShowErrorsState = {
+  basicInfo: false,
+  cta: false,
+  additionalInfo: false,
+};
+
 export const useWebinarStore = create<WebinarStore>((set, get) => ({
   isModalOpen: false,
   isComplete: false,
   isSubmitting: false,
   formData: initialState,
   validation: initialValidation,
+  showErrors: initialShowErrors,
 
   setIsModalOpen: (open: boolean) => set({ isModalOpen: open }),
   setIsComplete: (complete: boolean) => set({ isComplete: complete }),
   setIsSubmitting: (submitting: boolean) => set({ isSubmitting: submitting }),
+  setShowErrorsForStep: (stepId, show) =>
+    set((state) => ({ showErrors: { ...state.showErrors, [stepId]: show } })),
 
   updateBasicInfoField: (field, value) => {
     set((state) => {
@@ -181,14 +198,10 @@ export const useWebinarStore = create<WebinarStore>((set, get) => ({
         break;
     }
 
-    set((state) => {
-      return {
-        validation: {
-          ...state.validation,
-          [stepId]: validationResult,
-        },
-      };
-    });
+    set((state) => ({
+      validation: { ...state.validation, [stepId]: validationResult },
+      showErrors: { ...state.showErrors, [stepId]: !validationResult.valid },
+    }));
     return validationResult.valid;
   },
 
@@ -202,6 +215,7 @@ export const useWebinarStore = create<WebinarStore>((set, get) => ({
       isSubmitting: false,
       formData: initialState,
       validation: initialValidation,
+      showErrors: initialShowErrors,
     }),
 
   addTag: (tag: string) => {

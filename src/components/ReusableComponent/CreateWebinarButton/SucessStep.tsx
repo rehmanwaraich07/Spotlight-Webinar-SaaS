@@ -17,17 +17,19 @@ const SucessStep = ({ webinarLink, onCreateNew }: Props) => {
     setTimeout(() => setCopied(false), 2000);
   };
   return (
-    <div className="relative text-center space-y-6 py-8 px-6">
+    <div className="relative text-center space-y-6 py-10 px-6 md:px-10 max-w-2xl mx-auto">
       <div className="flex justify-center items-center">
-        <div className="bg-green-500 rounded-full p-2">
-          <Check className="h-6 w-6 text-primary" />
+        <div className="bg-green-500/20 border border-green-500/40 rounded-full p-3">
+          <Check className="h-6 w-6 text-green-400" />
         </div>
       </div>
-      <h2 className="text-2xl font-bold">Your webinar has been created</h2>
-      <p className="text-foreground">
+      <h2 className="text-2xl md:text-3xl font-bold">
+        Your webinar has been created
+      </h2>
+      <p className="text-foreground/90">
         You can share the link with your viewers for them to join
       </p>
-      <div className="flex mt-4 mx-w-md mx-auto">
+      <div className="flex mt-4 max-w-xl mx-auto">
         <Input
           value={webinarLink}
           readOnly

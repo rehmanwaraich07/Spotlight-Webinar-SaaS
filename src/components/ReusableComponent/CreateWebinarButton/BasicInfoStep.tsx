@@ -15,8 +15,12 @@ import React from "react";
 import { toast } from "sonner";
 
 const BasicInfoStep = () => {
-  const { formData, updateBasicInfoField, getStepValidationErrors } =
-    useWebinarStore();
+  const {
+    formData,
+    updateBasicInfoField,
+    getStepValidationErrors,
+    showErrors,
+  } = useWebinarStore();
   const { webinarName, description, date, time, timeFormat } =
     formData.basicInfo;
   const errors = getStepValidationErrors("basicInfo");
@@ -49,7 +53,9 @@ const BasicInfoStep = () => {
       <div className="space-y-4">
         <Label
           htmlFor="webinarName"
-          className={errors.webinarName ? "text-red-400" : ""}
+          className={
+            showErrors.basicInfo && errors.webinarName ? "text-red-400" : ""
+          }
         >
           Webinar name <span className="text-red-400">*</span>
         </Label>
@@ -61,17 +67,21 @@ const BasicInfoStep = () => {
           placeholder="Introduction to Mochi"
           className={cn(
             "!bg-background/50 border border-input",
-            errors.webinarName && "border-red-400 focus-visible:ring-red-400"
+            showErrors.basicInfo &&
+              errors.webinarName &&
+              "border-red-400 focus-visible:ring-red-400"
           )}
         />
-        {errors.webinarName && (
+        {showErrors.basicInfo && errors.webinarName && (
           <p className="text-sm text-red-400">{errors.webinarName}</p>
         )}
       </div>
       <div className="space-y-2">
         <Label
           htmlFor="description"
-          className={errors.description ? "text-red-400" : ""}
+          className={
+            showErrors.basicInfo && errors.description ? "text-red-400" : ""
+          }
         >
           Descrption <span className="text-red-400">*</span>
         </Label>
@@ -83,16 +93,22 @@ const BasicInfoStep = () => {
           placeholder="Enter a brief description of your webinar"
           className={cn(
             "min-h-[100px] !bg-background/50 border border-input",
-            errors.description && "border-red-400 focus-visible:ring-red-400"
+            showErrors.basicInfo &&
+              errors.description &&
+              "border-red-400 focus-visible:ring-red-400"
           )}
         />
-        {errors.description && (
+        {showErrors.basicInfo && errors.description && (
           <p className="text-sm text-red-400">{errors.description}</p>
         )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label className={errors.date ? "text-red-400" : ""}>
+          <Label
+            className={
+              showErrors.basicInfo && errors.date ? "text-red-400" : ""
+            }
+          >
             Webinar date <span className="text-red-400">*</span>
           </Label>
           <Popover>
@@ -102,7 +118,9 @@ const BasicInfoStep = () => {
                 className={cn(
                   "w-full justify-start text-left font-normal !bg-background/50 border border-input",
                   !date && "text-gray-500",
-                  errors.data && "border-red-400 focus-visible:ring-red-400"
+                  showErrors.basicInfo &&
+                    errors.data &&
+                    "border-red-400 focus-visible:ring-red-400"
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
@@ -124,10 +142,16 @@ const BasicInfoStep = () => {
               />
             </PopoverContent>
           </Popover>
-          {errors.date && <p className="text-sm text-red-400">{errors.date}</p>}
+          {showErrors.basicInfo && errors.date && (
+            <p className="text-sm text-red-400">{errors.date}</p>
+          )}
         </div>
         <div className="space-y-2">
-          <Label className={errors.time ? "text-red-400" : ""}>
+          <Label
+            className={
+              showErrors.basicInfo && errors.time ? "text-red-400" : ""
+            }
+          >
             Webinar time <span className="text-red-400">*</span>
           </Label>
           <div className="flex gap-2">
@@ -140,7 +164,9 @@ const BasicInfoStep = () => {
                 placeholder="12:00"
                 className={cn(
                   "pl-9 !bg-background/50 border border-input",
-                  errors.time && "border-red-400 focus-visible:ring-red-400"
+                  showErrors.basicInfo &&
+                    errors.time &&
+                    "border-red-400 focus-visible:ring-red-400"
                 )}
               />
             </div>
@@ -157,7 +183,9 @@ const BasicInfoStep = () => {
               </SelectContent>
             </Select>
           </div>
-          {errors.time && <p className="text-sm text-red-400">{errors.time}</p>}
+          {showErrors.basicInfo && errors.time && (
+            <p className="text-sm text-red-400">{errors.time}</p>
+          )}
         </div>
       </div>
       <div className="flex items-center gap-2 text-sm text-gray-400 mt-4">

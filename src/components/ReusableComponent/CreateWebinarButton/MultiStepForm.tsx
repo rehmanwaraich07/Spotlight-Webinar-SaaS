@@ -28,6 +28,7 @@ const MultiStepForm = ({ steps, onComplete }: Props) => {
     isSubmitting,
     setIsSubmitting,
     setIsModalOpen,
+    setShowErrorsForStep,
   } = useWebinarStore();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
@@ -54,6 +55,7 @@ const MultiStepForm = ({ steps, onComplete }: Props) => {
 
     if (!isValid) {
       setValidationErrors("Please fill out all required fields.");
+      setShowErrorsForStep(currentStep.id as keyof typeof formData, true);
       return;
     }
 
@@ -86,9 +88,9 @@ const MultiStepForm = ({ steps, onComplete }: Props) => {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center bg-[#27272A]/20 border border-border rounded-3xl overflow-hidden max-w-7xl mx-auto backdrop-blur-[106px]">
-      <div className="flex items-center justify-start">
-        <div className="w-full md:w-1/3 p-6">
+    <div className="flex flex-col justify-center items-center bg-[#27272A]/20 border border-border rounded-3xl overflow-hidden w-full md:w-[960px] mx-auto backdrop-blur-[106px]">
+      <div className="flex flex-col md:flex-row items-stretch justify-start w-full">
+        <div className="w-full md:w-[280px] flex-shrink-0 p-6 md:border-r md:border-border/60">
           <div className="space-y-4">
             {steps.map((step, index) => {
               const isCompleted = completedSteps.includes(step.id);
@@ -180,14 +182,10 @@ const MultiStepForm = ({ steps, onComplete }: Props) => {
           </div>
         </div>
 
-        <Separator
-          orientation="vertical"
-          className="data-[orientation=vertical]:h-1/2"
-        />
-        <div className="w-full md:w-2/3">
+        <div className="w-full md:flex-1 min-w-0">
           <AnimatePresence mode="wait">
             <motion.div
-              className="p-6"
+              className="p-6 md:p-8"
               key={currentStep.id}
               initial={{ x: 20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
