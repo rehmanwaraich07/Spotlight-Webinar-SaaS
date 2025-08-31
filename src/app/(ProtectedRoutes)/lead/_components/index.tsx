@@ -13,16 +13,29 @@ import { HomeIcon } from "lucide-react";
 import React, { useState } from "react";
 import { FaUserGroup } from "react-icons/fa6";
 import { FaUser } from "react-icons/fa6";
-import { leadData } from "../__tests__/data";
-const LeadsPage = () => {
+
+type LeadItem = {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  tags: string[];
+  createdAt: Date;
+};
+
+const LeadsPage = ({
+  initialLeads = [] as LeadItem[],
+}: {
+  initialLeads?: LeadItem[];
+}) => {
   const [search, setSearch] = useState("");
 
-  const filteredLeads = leadData.filter((lead) => {
+  const filteredLeads = (initialLeads || []).filter((lead) => {
     const searchLower = search.toLowerCase();
     return (
       lead.name.toLowerCase().includes(searchLower) ||
       lead.email.toLowerCase().includes(searchLower) ||
-      lead.phone.toLowerCase().includes(searchLower) ||
+      (lead.phone && lead.phone.toLowerCase().includes(searchLower)) ||
       (lead.tags &&
         lead.tags.some((tag) => tag.toLowerCase().includes(searchLower)))
     );

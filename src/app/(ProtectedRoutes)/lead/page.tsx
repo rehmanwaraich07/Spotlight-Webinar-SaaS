@@ -1,9 +1,11 @@
 import LeadsPage from "./_components";
+import { getAllLeads } from "@/actions/leads";
 
-const Page = () => {
+const Page = async () => {
+  const leads = await getAllLeads();
   return (
     <div>
-      <LeadsPage />
+      <LeadsPage initialLeads={leads} />
     </div>
   );
 };
