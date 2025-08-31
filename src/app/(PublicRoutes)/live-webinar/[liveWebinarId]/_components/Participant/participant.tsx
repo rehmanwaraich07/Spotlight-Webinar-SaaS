@@ -2,7 +2,13 @@ import { getStreamIoToken } from "@/actions/streamio";
 import { Button } from "@/components/ui/button";
 import { WebinarWithPresenter } from "@/lib/type";
 import { useAttendeeStore } from "@/store/useAttendeeStore";
-import { StreamVideoClient, type User, Call } from "@stream-io/video-react-sdk";
+import {
+  StreamVideoClient,
+  type User,
+  Call,
+  StreamVideo,
+  StreamCall,
+} from "@stream-io/video-react-sdk";
 import { AlertCircle, Loader2, WifiOff } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -191,7 +197,7 @@ const Participant = ({ apikey, callId, webinar }: Props) => {
                   Try Again
                 </Button>
                 <Button
-                  className="bg-accent hover:bg-accent/80 text-accent-foreground"
+                  className="bg-accent hover:bg-accent/80 text-accent-foreground cursor-pointer"
                   onClick={() => (window.location.href = "/")}
                 >
                   Back to Home
@@ -203,5 +209,21 @@ const Participant = ({ apikey, callId, webinar }: Props) => {
       </div>
     );
   }
+
+  return (
+    <StreamVideo client={client}>
+      <StreamCall call={call}>
+        <LiveWebinarView
+          showChat={showChat}
+          setShowChat={setShowChat}
+          webinar={webinar}
+          userId={attendee?.id}
+          isHost={false}
+          username={attendee?.name}
+          userToken={token}
+        />
+      </StreamCall>
+    </StreamVideo>
+  );
 };
 export default Participant;

@@ -9,6 +9,10 @@ import { AiFillMessage } from "react-icons/ai";
 import { Button } from "@/components/ui/button";
 import { CtaTypeEnum } from "@prisma/client";
 import CTADialogBox from "./CTADialogBox";
+import { Loader2 } from "lucide-react";
+import { changeWebinarStatus } from "@/actions/webinar";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 type Props = {
   showChat: boolean;
@@ -32,6 +36,9 @@ const LiveWebinarView = ({
   const [chatClient, setChatClient] = useState<StreamChat | null>(null);
   const [channel, setChannel] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
 
   const { useParticipantCount, useParticipants } = useCallStateHooks();
   const participants = useParticipants();
@@ -97,6 +104,23 @@ const LiveWebinarView = ({
   }, [chatClient, channel, isHost]);
 
   //   if (!chatClient || !channel) return null;
+
+  const handleEndStream = async () => {
+    setLoading(true);
+    try {
+      const res = await changeWebinarStatus(webinar.id, "ENDED");
+      if (!res.success) {
+        throw new Error(res.message);
+      }
+      router.refresh();
+      toast.success("Webinar Ended Successfully");
+    } catch (error) {
+      toast.error("Failed to End the Stream");
+      throw new Error("failed to end the stream");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="flex flex-col w-full h-screen max-h-screen overflow-hidden bg-background text-primary">
       <div className="py-2 px-2 border-b border-border flex items-center justify-between">
@@ -164,6 +188,15 @@ const LiveWebinarView = ({
 
             {isHost && (
               <div className="flex items-center space-x-1">
+                <Button onClick={handleEndStream} disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="animate-spin mr-2 cursor-pointer" />
+                    </>
+                  ) : (
+                    "End Stream"
+                  )}
+                </Button>
                 <Button
                   onClick={handleCTAButtonClick}
                   className="cursor-pointer"

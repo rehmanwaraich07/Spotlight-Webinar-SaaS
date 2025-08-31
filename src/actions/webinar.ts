@@ -120,11 +120,28 @@ export const createWebinar = async (formData: WebinarFormState) => {
   }
 };
 
-export const getWebianrByPresenterId = async (presenterId: string) => {
+export const getWebianrByPresenterId = async (
+  presenterId: string,
+  webinarStatus?: string
+) => {
   try {
+    let statusFilter: WebinarStatusEnum | undefined;
+
+    switch (webinarStatus) {
+      case "upcoming":
+        statusFilter = WebinarStatusEnum.SCHEDULED;
+        break;
+
+      case "ended":
+        statusFilter = WebinarStatusEnum.ENDED;
+        break;
+      default:
+        statusFilter = undefined;
+    }
     const webinars = await prismaClient.webinar.findMany({
       where: {
         presenterId,
+        webinarStatus: statusFilter,
       },
       include: {
         presenter: {
@@ -143,6 +160,7 @@ export const getWebianrByPresenterId = async (presenterId: string) => {
   }
 };
 
+// TODO update on  frotend as well
 export const getWebinarById = async (webinarId: string) => {
   try {
     const webinar = await prismaClient.webinar.findUnique({

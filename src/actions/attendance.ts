@@ -18,6 +18,7 @@ export const getWebinarAttendance = async (
         id: true,
         ctaType: true,
         tags: true,
+        presenter: true,
         _count: {
           select: {
             attendances: true,
@@ -120,13 +121,12 @@ export const getWebinarAttendance = async (
       }
     }
 
-    // revalidatePath(`/webinars/${webinar.id}/pipelines`);
-
     return {
       success: true,
       data: result,
       ctaType: webinar.ctaType,
       webinarTags: webinar.tags || [],
+      presenter: webinar.presenter,
     };
   } catch (error) {
     console.error("Error fetching webinar attendance:", error);
