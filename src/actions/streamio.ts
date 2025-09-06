@@ -12,6 +12,7 @@ export const getStreamIoToken = async (attendee: Attendee | null) => {
       image: `https://api.dicebear.com/7.x/initials/svg?seed=${
         attendee?.name || "Guest"
       }`,
+      role: "user",
     };
     await getStreamClient.upsertUsers([newUser]);
 

@@ -11,6 +11,7 @@ import {
 } from "@stream-io/video-react-sdk";
 import { AlertCircle, Loader2, WifiOff } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
+import LiveWebinarView from "../Common/LiveWebinarView";
 
 type Props = {
   apikey: string;
@@ -63,8 +64,9 @@ const Participant = ({ apikey, callId, webinar }: Props) => {
 
         await streamClient.connectUser(user, userToken);
 
-        const streamCall = streamClient.call("livestream", callId);
-        await streamCall.join({ create: true });
+        // Use the webinar ID as the call ID for consistency
+        const streamCall = streamClient.call("livestream", webinar.id);
+        await streamCall.join();
 
         setClient(streamClient);
         setCall(streamCall);
@@ -167,7 +169,7 @@ const Participant = ({ apikey, callId, webinar }: Props) => {
               <div className="mx-auto w-16 h-16 mb-4 text-amber-500">
                 <WifiOff className="h-16 w-16 animate-pulse" />
               </div>
-              <h2 className="text-xl font-semibold mb-2">Reconnectin</h2>
+              <h2 className="text-xl font-semibold mb-2">Reconnecting</h2>
               <p className="text-muted-foreground mb-4">
                 Connection lost. Attempting to reconnect...
               </p>
@@ -185,7 +187,7 @@ const Participant = ({ apikey, callId, webinar }: Props) => {
               <div className="mx-auto w-16 h-16 mb-4 text-destructive">
                 <AlertCircle className="h-16 w-16" />
               </div>
-              <h2 className="text-xl font-semibold mb-2">Connetion Failed</h2>
+              <h2 className="text-xl font-semibold mb-2">Connection Failed</h2>
               <p className="text-muted-foreground mb-6">
                 {errorMessage || "Unable to Connect to the webinar"}
               </p>

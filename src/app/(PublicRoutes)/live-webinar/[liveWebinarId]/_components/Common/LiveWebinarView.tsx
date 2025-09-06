@@ -188,7 +188,11 @@ const LiveWebinarView = ({
 
             {isHost && (
               <div className="flex items-center space-x-1">
-                <Button onClick={handleEndStream} disabled={loading}>
+                <Button
+                  onClick={handleEndStream}
+                  disabled={loading}
+                  className="cursor-pointer"
+                >
                   {loading ? (
                     <>
                       <Loader2 className="animate-spin mr-2 cursor-pointer" />
