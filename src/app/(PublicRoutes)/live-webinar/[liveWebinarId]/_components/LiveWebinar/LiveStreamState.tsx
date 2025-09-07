@@ -11,21 +11,20 @@ import { getTokenForHost } from "@/actions/streamio";
 
 type Props = {
   apiKey: string;
-  token: string;
   callId: string;
   user: User;
   webinar: WebinarWithPresenter;
 };
 
-const LiveStreamState = ({ apiKey, token, callId, user, webinar }: Props) => {
+const LiveStreamState = ({ apiKey, callId, user, webinar }: Props) => {
   const streamUser: StreamUser = {
     id: user.id,
     name: user.name || "Unknown User",
     image: user.profileImage || undefined,
   };
 
-  const client = new StreamVideoClient({ apiKey, user: streamUser, token });
   const [hostToken, setHostToken] = useState<string | null>(null);
+  const [client, setClient] = useState<StreamVideoClient | null>(null);
 
   useEffect(() => {
     const init = async () => {
@@ -41,11 +40,24 @@ const LiveStreamState = ({ apiKey, token, callId, user, webinar }: Props) => {
           name: webinar.presenter.name,
           image: webinar.presenter.profileImage,
         };
-      } catch (error) {}
+
+        const streamClient = new StreamVideoClient({
+          apiKey,
+          user: hostUser,
+          token,
+        });
+        setHostToken(token);
+        setClient(streamClient);
+      } catch (error: any) {
+        console.error("Error initializing Stream Client");
+        throw new Error("Error Initializing the Stream Client: ", error);
+      }
     };
 
     init();
   }, [apiKey, webinar]);
+
+  if (!client || !hostToken) return null;
 
   return (
     <StreamVideo client={client}>
@@ -54,7 +66,7 @@ const LiveStreamState = ({ apiKey, token, callId, user, webinar }: Props) => {
         callType={"livestream"}
         webinar={webinar}
         username={user.name || "Unknown User"}
-        token={token}
+        token={hostToken}
         userId={user.id}
       />
     </StreamVideo>

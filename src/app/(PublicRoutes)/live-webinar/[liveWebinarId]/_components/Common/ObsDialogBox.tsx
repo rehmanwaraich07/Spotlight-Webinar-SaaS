@@ -51,9 +51,14 @@ const ObsDialogBox = ({ open, onOpenChange, rtmpURL, streamKey }: Props) => {
             </div>
           </div>
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Stream Key</Label>
+            <Label className="text-sm font-medium">Password Key</Label>
             <div className="flex">
-              <Input className="flex-1" value={streamKey} readOnly />
+              <Input
+                className="flex-1"
+                value={streamKey}
+                readOnly
+                type="password"
+              />
               <Button
                 variant={"outline"}
                 size={"icon"}

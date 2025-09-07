@@ -4,6 +4,7 @@ import { Attendee, Webinar } from "@prisma/client";
 import { getStreamClient } from "@/lib/stream/streamClient";
 import { UserRequest } from "@stream-io/node-sdk";
 import { prismaClient } from "@/lib/prismaClient";
+import { StreamCallRecording } from "@/lib/type";
 
 export const getStreamIoToken = async (attendee: Attendee | null) => {
   try {
@@ -91,5 +92,28 @@ export const createAndStartStream = async (webinar: Webinar) => {
     console.log("Stream Created and Started Successfully!");
   } catch (error: any) {
     console.error("Failed to Create and Start the stream: ", error);
+  }
+};
+
+export const getStreamRecording = async (
+  webinarId: string
+): Promise<StreamCallRecording | null> => {
+  try {
+    const call = getStreamClient.video.call("livestream", webinarId);
+    const result = await call.listRecordings();
+
+    const first = (result as any)?.recordings?.[0];
+    if (!first) return null;
+
+    return {
+      filename: first.filename,
+      url: first.url,
+      start_time: new Date(first.start_time),
+      end_time: new Date(first.end_time),
+      session_id: first.session_id,
+    };
+  } catch (error) {
+    console.error("Failed to fetch stream recording:", error);
+    return null;
   }
 };

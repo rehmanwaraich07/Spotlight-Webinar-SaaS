@@ -102,7 +102,7 @@ const Participant = ({ apikey, callId, webinar }: Props) => {
           });
       }
     };
-  }, [apikey, callId, attendee, call, client]);
+  }, [apikey, callId, attendee, call, client, webinar.id]);
 
   if (!attendee) {
     return (
@@ -223,6 +223,7 @@ const Participant = ({ apikey, callId, webinar }: Props) => {
           isHost={false}
           username={attendee?.name}
           userToken={token}
+          call={call}
         />
       </StreamCall>
     </StreamVideo>

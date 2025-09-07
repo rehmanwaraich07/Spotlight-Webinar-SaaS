@@ -3,6 +3,9 @@ import { getWebinarById } from "@/actions/webinar";
 import { validateStreamEnvVars } from "@/lib/utils";
 import React from "react";
 import RenderWebinar from "./_components/UpcomingWebinar/RenderWebinar";
+import { WebinarWithPresenter } from "@/lib/type";
+import { WebinarStatusEnum } from "@prisma/client";
+import { getStreamRecording } from "@/actions/streamio";
 
 type Props = {
   params: Promise<{
@@ -18,6 +21,11 @@ const page = async ({ params, searchParams }: Props) => {
   const { error } = await searchParams;
 
   const webinarData = await getWebinarById(liveWebinarId);
+  let recording = null;
+
+  if (webinarData?.webinarStatus === WebinarStatusEnum.ENDED) {
+    recording = await getStreamRecording(liveWebinarId);
+  }
 
   if (!webinarData) {
     return (
@@ -62,8 +70,6 @@ const page = async ({ params, searchParams }: Props) => {
   }
 
   const apikey = process.env.NEXT_PUBLIC_STREAM_API_KEY as string;
-  const token = process.env.STREAM_TOKEN as string;
-  const callId = process.env.STREAM_CALL_ID as string;
 
   // Validate required environment variables
   if (!validateStreamEnvVars()) {
@@ -85,11 +91,10 @@ const page = async ({ params, searchParams }: Props) => {
     <div className="w-full min-h-screen mx-auto">
       <RenderWebinar
         apikey={apikey}
-        token={token}
-        callId={callId}
         user={checkUser.user}
         error={error}
-        webinar={webinarData}
+        webinar={webinarData as WebinarWithPresenter}
+        recording={recording || null}
       />
     </div>
   );
