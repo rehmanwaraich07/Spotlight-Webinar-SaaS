@@ -5,8 +5,9 @@ import {
 } from "@stream-io/video-react-sdk";
 import { WebinarWithPresenter } from "@/lib/type";
 import { User } from "@prisma/client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import CustomLiveStreamPlayer from "./CustomLiveStreamPlayer";
+import { getTokenForHost } from "@/actions/streamio";
 
 type Props = {
   apiKey: string;
@@ -24,6 +25,27 @@ const LiveStreamState = ({ apiKey, token, callId, user, webinar }: Props) => {
   };
 
   const client = new StreamVideoClient({ apiKey, user: streamUser, token });
+  const [hostToken, setHostToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const token = await getTokenForHost(
+          webinar.presenterId,
+          webinar.presenter.name,
+          webinar.presenter.profileImage
+        );
+
+        const hostUser: StreamUser = {
+          id: webinar.presenterId,
+          name: webinar.presenter.name,
+          image: webinar.presenter.profileImage,
+        };
+      } catch (error) {}
+    };
+
+    init();
+  }, [apiKey, webinar]);
 
   return (
     <StreamVideo client={client}>

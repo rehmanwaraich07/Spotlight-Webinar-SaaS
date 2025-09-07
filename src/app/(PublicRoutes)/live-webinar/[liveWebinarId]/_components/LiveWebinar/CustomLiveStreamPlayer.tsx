@@ -6,6 +6,7 @@ import {
 } from "@stream-io/video-react-sdk";
 import { WebinarWithPresenter } from "@/lib/type";
 import React, { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 import LiveWebinarView from "../Common/LiveWebinarView";
 import { getStreamIoToken } from "@/actions/streamio";
 
@@ -55,9 +56,10 @@ const CustomLiveStreamPlayer = ({
     // Use the webinar ID as the call ID for consistency
     const myCall = client.call(callType, webinar.id);
     setCall(myCall);
-    myCall.join().catch((e) => {
-      console.log("Failed to Join the call ", e);
-    });
+    myCall.join({ create: true }).then(
+      () => setCall(myCall),
+      () => console.error("Failed to Join Call ")
+    );
 
     return () => {
       myCall.leave().catch((e) => {
@@ -69,9 +71,26 @@ const CustomLiveStreamPlayer = ({
   if (!call || !userToken) {
     return (
       <div className="flex items-center justify-center h-screen bg-background text-foreground">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="text-muted-foreground">Initializing host controls...</p>
+        <div className="text-center max-w-md p-8 rounded-lg border border-border bg-card shadow-sm">
+          <div className="relative mx-auto h-24 w-24 mb-6">
+            <div className="absolute inset-0 rounded-full border-t-2 border-accent animate-spin" />
+            <div className="absolute inset-3 rounded-full bg-card flex items-center justify-center">
+              <Loader2 className="h-10 w-10 text-accent animate-spin" />
+            </div>
+          </div>
+          <h2 className="text-xl font-semibold mb-2">Initializing Controls</h2>
+          <p className="text-muted-foreground">Preparing host environment...</p>
+          <div className="mt-6 flex justify-center space-x-1">
+            <span className="h-2 w-2 bg-accent rounded-full animate-bounce" />
+            <span
+              className="h-2 w-2 bg-accent rounded-full animate-bounce"
+              style={{ animationDelay: "0.2s" }}
+            />
+            <span
+              className="h-2 w-2 bg-accent rounded-full animate-bounce"
+              style={{ animationDelay: "0.4s" }}
+            />
+          </div>
         </div>
       </div>
     );
@@ -86,6 +105,7 @@ const CustomLiveStreamPlayer = ({
         userToken={userToken}
         webinar={webinar}
         userId={userId}
+        call={call}
       />
     </StreamCall>
   );

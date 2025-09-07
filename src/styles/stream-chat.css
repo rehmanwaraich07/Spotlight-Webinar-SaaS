@@ -1,0 +1,99 @@
+.spotlight-chat {
+  /* Theme variables mapped to your app's design system */
+  --str-chat__background-color: hsl(var(--card));
+  --str-chat__surface-color: hsl(var(--card));
+  --str-chat__text-color: hsl(var(--foreground));
+  --str-chat__secondary-text-color: hsl(var(--muted-foreground));
+  --str-chat__primary-color: hsl(var(--primary));
+  --str-chat__primary-color-cta: hsl(var(--primary));
+  --str-chat__primary-button-text: hsl(var(--primary-foreground));
+  --str-chat__link-color: hsl(var(--primary));
+  --str-chat__border-color: hsl(var(--border));
+  --str-chat__muted-color: hsl(var(--muted));
+
+  --str-chat__border-radius: 10px;
+  --str-chat__message-bubble-border-radius: 14px;
+  --str-chat__message-bubble-border-color: hsl(var(--border));
+  --str-chat__font-family: inherit;
+}
+.spotlight-chat .str-chat__message-notification,
+.spotlight-chat .str-chat__message-deleted {
+  display: none !important;
+}
+
+
+/* Remove default backgrounds so it blends with your card */
+.spotlight-chat .str-chat,
+.spotlight-chat .str-chat__container,
+.spotlight-chat .str-chat__list,
+.spotlight-chat .str-chat__channel,
+.spotlight-chat .str-chat__virtual-list,
+.spotlight-chat .str-chat__main-panel {
+  background: transparent !important;
+}
+
+/* Message list padding and separators */
+.spotlight-chat .str-chat__list {
+  padding: 8px 8px 0 8px;
+}
+.spotlight-chat .str-chat__date-separator__date {
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  border-radius: 9999px;
+  padding: 2px 8px;
+}
+
+/* Message bubbles */
+.spotlight-chat .str-chat__message-bubble {
+  border-radius: var(--str-chat__message-bubble-border-radius);
+  border: 1px solid var(--str-chat__message-bubble-border-color);
+}
+.spotlight-chat .str-chat__message-simple--me .str-chat__message-bubble {
+  background: hsl(var(--primary) / 0.12);
+  border-color: hsl(var(--primary) / 0.35);
+}
+
+/* Hide overly busy actions like inline reactions (optional) */
+.spotlight-chat .str-chat__message-simple__actions__action--reactions {
+  display: none;
+}
+
+/* Message input area */
+.spotlight-chat .str-chat__message-input {
+  background: transparent;
+  border-top: 1px solid hsl(var(--border));
+}
+.spotlight-chat .str-chat__message-input-textarea-wrapper {
+  background: hsl(var(--muted));
+  border: 1px solid hsl(var(--border));
+  border-radius: 12px;
+}
+.spotlight-chat .str-chat__message-input-textarea {
+  background: transparent;
+  color: hsl(var(--foreground));
+}
+.spotlight-chat .str-chat__send-button {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-radius: 8px;
+}
+
+/* Avatars and usernames */
+.spotlight-chat .str-chat__avatar {
+  box-shadow: none;
+}
+.spotlight-chat .str-chat__message-simple__author {
+  color: hsl(var(--muted-foreground));
+  font-weight: 500;
+}
+
+/* Scrollbar aesthetics */
+.spotlight-chat .str-chat__list::-webkit-scrollbar {
+  width: 8px;
+}
+.spotlight-chat .str-chat__list::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted));
+  border-radius: 9999px;
+}
+
+
