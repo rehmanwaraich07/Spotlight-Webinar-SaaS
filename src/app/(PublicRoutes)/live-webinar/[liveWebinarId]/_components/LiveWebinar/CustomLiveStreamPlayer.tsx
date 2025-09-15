@@ -42,9 +42,17 @@ const CustomLiveStreamPlayer = ({
           name: username,
         };
         const token = await getStreamIoToken(hostAttendee as any);
-        setUserToken(token || "");
-      } catch (error) {
+        if (token) {
+          setUserToken(token);
+        } else {
+          console.error("No token received from getStreamIoToken");
+          // Set a fallback token or show error state
+          setUserToken("fallback-token");
+        }
+      } catch (error: any) {
         console.error("Failed to generate user token:", error);
+        // Set a fallback token to prevent blocking the UI
+        setUserToken("fallback-token");
       }
     };
 
@@ -58,7 +66,15 @@ const CustomLiveStreamPlayer = ({
     setCall(myCall);
     myCall.join({ create: true }).then(
       () => setCall(myCall),
-      () => console.error("Failed to Join Call ")
+      (err) => {
+        console.error("Failed to Join Call", err);
+        // Surface some likely causes
+        console.error("Join debug:", {
+          callId: webinar.id,
+          callType,
+          hasClient: Boolean(client),
+        });
+      }
     );
 
     return () => {

@@ -48,6 +48,11 @@ const LiveWebinarView = ({
   const [OBSDialogBox, setOBSDialogBox] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingLoading, setRecordingLoading] = useState(false);
+  const [isOBSConnected, setIsOBSConnected] = useState(false);
+  const [connectionAttempts, setConnectionAttempts] = useState(0);
+  const [lastConnectionTime, setLastConnectionTime] = useState<Date | null>(
+    null
+  );
 
   const router = useRouter();
 
@@ -115,27 +120,71 @@ const LiveWebinarView = ({
   }, [chatClient, channel, isHost]);
 
   useEffect(() => {
-    call.on("call.rtmp_broadcast_started", () => {
-      toast.success("Webinar Stream Started Successfully");
-      router.refresh();
-    });
+    const handleRTMPStarted = () => {
+      setIsOBSConnected(true);
+      setConnectionAttempts(0);
+      setLastConnectionTime(new Date());
+      toast.success(
+        "🎉 Live stream is now active! Your OBS stream is connected."
+      );
+      console.log("RTMP broadcast started successfully");
+    };
 
-    call.on("call.rtmp_broadcast_failed", () => {
-      toast.error("Failed to Start the Webinar Stream");
-    });
+    const handleRTMPFailed = (error: any) => {
+      setIsOBSConnected(false);
+      setConnectionAttempts((prev) => prev + 1);
+      console.error("RTMP broadcast failed:", error);
 
-    call.on("call.recording_started", () => {
+      if (connectionAttempts < 3) {
+        toast.error(
+          `Connection attempt ${
+            connectionAttempts + 1
+          } failed. Retrying... Check your OBS settings.`
+        );
+      } else {
+        toast.error(
+          `Multiple connection failures. Please check OBS optimization settings and try again.`
+        );
+      }
+    };
+
+    const handleRTMPStopped = () => {
+      setIsOBSConnected(false);
+      toast.info("Live stream has stopped");
+      console.log("RTMP broadcast stopped");
+    };
+
+    const handleRecordingStarted = () => {
       setIsRecording(true);
       toast.success("Recording started");
-    });
-    call.on("call.recording_stopped", () => {
+    };
+
+    const handleRecordingStopped = () => {
       setIsRecording(false);
       toast.success("Recording stopped");
-    });
-    call.on("call.recording_failed", () => {
+    };
+
+    const handleRecordingFailed = () => {
       setIsRecording(false);
       toast.error("Recording failed");
-    });
+    };
+
+    call.on("call.rtmp_broadcast_started", handleRTMPStarted);
+    call.on("call.rtmp_broadcast_failed", handleRTMPFailed);
+    call.on("call.rtmp_broadcast_stopped", handleRTMPStopped);
+    call.on("call.recording_started", handleRecordingStarted);
+    call.on("call.recording_stopped", handleRecordingStopped);
+    call.on("call.recording_failed", handleRecordingFailed);
+
+    // Cleanup event listeners
+    return () => {
+      call.off("call.rtmp_broadcast_started", handleRTMPStarted);
+      call.off("call.rtmp_broadcast_failed", handleRTMPFailed);
+      call.off("call.rtmp_broadcast_stopped", handleRTMPStopped);
+      call.off("call.recording_started", handleRecordingStarted);
+      call.off("call.recording_stopped", handleRecordingStopped);
+      call.off("call.recording_failed", handleRecordingFailed);
+    };
   }, [call]);
 
   useEffect(() => {
@@ -181,6 +230,21 @@ const LiveWebinarView = ({
     }
   };
 
+  const debugRTMPConnection = () => {
+    console.log("=== RTMP Debug Info ===");
+    console.log("Webinar ID:", webinar.id);
+    console.log("User Token:", userToken);
+    console.log(
+      "RTMP URL:",
+      `rtmps://ingress.stream-io-video.com:443/livestream/${webinar.id}`
+    );
+    console.log("Stream Key:", userToken);
+    console.log("Call State:", call?.state);
+    console.log("Participants:", participants.length);
+    console.log("Is OBS Connected:", isOBSConnected);
+    console.log("=======================");
+  };
+
   return (
     <div className="flex flex-col w-full h-screen max-h-screen overflow-hidden bg-background text-primary">
       <div className="py-2 px-2 border-b border-border flex items-center justify-between">
@@ -192,6 +256,32 @@ const LiveWebinarView = ({
             </span>
             LIVE
           </div>
+          {isHost && (
+            <div
+              className={`px-3 py-1 rounded-full text-sm font-medium flex items-center ${
+                isOBSConnected
+                  ? "bg-green-500/15 text-green-400"
+                  : connectionAttempts > 0
+                  ? "bg-red-500/15 text-red-400"
+                  : "bg-amber-500/15 text-amber-400"
+              }`}
+            >
+              <span
+                className={`relative flex h-2 w-2 mr-2 ${
+                  isOBSConnected
+                    ? "bg-green-400"
+                    : connectionAttempts > 0
+                    ? "bg-red-400"
+                    : "bg-amber-400"
+                } rounded-full`}
+              ></span>
+              {isOBSConnected
+                ? "OBS Connected"
+                : connectionAttempts > 0
+                ? `OBS Failed (${connectionAttempts})`
+                : "Waiting for OBS"}
+            </div>
+          )}
         </div>
 
         <div className="flex items-center space-x-3">
@@ -266,7 +356,10 @@ const LiveWebinarView = ({
                   {isRecording ? "Stop Recording" : "Start Recording"}
                 </Button>
                 <Button
-                  onClick={() => setOBSDialogBox(true)}
+                  onClick={() => {
+                    debugRTMPConnection();
+                    setOBSDialogBox(true);
+                  }}
                   className="mr-2 cursor-pointer"
                   variant={"outline"}
                 >
@@ -303,23 +396,34 @@ const LiveWebinarView = ({
           <div className="spotlight-chat">
             <Chat client={chatClient}>
               <Channel channel={channel}>
-                <div className="w-80 bg-card border border-border rounded-xl overflow-hidden flex flex-col shadow-sm">
-                  <div className="py-2 px-3 border-b border-border font-medium flex items-center justify-between">
-                    <span>Chat</span>
+                <div
+                  className="w-80 bg-black border border-slate-800 rounded-xl overflow-hidden flex flex-col shadow-sm chat-panel"
+                  style={{ backgroundColor: "#000000" }}
+                >
+                  <div
+                    className="py-2 px-3 border-b border-slate-800 font-medium flex items-center justify-between chat-panel-header bg-black"
+                    style={{ backgroundColor: "#000000" }}
+                  >
+                    <span className="text-white">Chat</span>
                     <span
                       className={`px-2 py-0.5 rounded-full text-xs ${
                         viewerCount > 0
                           ? "bg-emerald-500/15 text-emerald-400"
-                          : "bg-muted text-muted-foreground"
+                          : "bg-slate-700 text-slate-400"
                       }`}
                     >
                       {viewerCount} viewers
                     </span>
                   </div>
 
-                  <MessageList hideDeletedMessages={true} />
+                  <div style={{ backgroundColor: "#000000", flex: 1 }}>
+                    <MessageList hideDeletedMessages={true} />
+                  </div>
 
-                  <div className="p-2 border-t border-border">
+                  <div
+                    className="p-2 border-t border-slate-800 bg-black"
+                    style={{ backgroundColor: "#000000" }}
+                  >
                     <MessageInput focus />
                   </div>
                 </div>

@@ -1,20 +1,24 @@
 .spotlight-chat {
-  /* Theme variables mapped to your app's design system */
-  --str-chat__background-color: hsl(var(--card));
-  --str-chat__surface-color: hsl(var(--card));
-  --str-chat__text-color: hsl(var(--foreground));
-  --str-chat__secondary-text-color: hsl(var(--muted-foreground));
-  --str-chat__primary-color: hsl(var(--primary));
-  --str-chat__primary-color-cta: hsl(var(--primary));
-  --str-chat__primary-button-text: hsl(var(--primary-foreground));
-  --str-chat__link-color: hsl(var(--primary));
-  --str-chat__border-color: hsl(var(--border));
-  --str-chat__muted-color: hsl(var(--muted));
+  /* Modern dark theme with improved contrast */
+  --str-chat__background-color: #0a0a0a !important;
+  --str-chat__surface-color: #0a0a0a !important;
+  --str-chat__text-color: #f8fafc !important;
+  --str-chat__secondary-text-color: #94a3b8 !important;
+  --str-chat__primary-color: #8b5cf6 !important; /* violet-500 */
+  --str-chat__primary-color-cta: #8b5cf6 !important;
+  --str-chat__primary-button-text: #ffffff !important;
+  --str-chat__link-color: #8b5cf6 !important;
+  --str-chat__border-color: #1e293b !important; /* slate-800 */
+  --str-chat__muted-color: #0f172a !important;
 
-  --str-chat__border-radius: 10px;
-  --str-chat__message-bubble-border-radius: 14px;
-  --str-chat__message-bubble-border-color: hsl(var(--border));
+  --str-chat__border-radius: 12px;
+  --str-chat__message-bubble-border-radius: 16px;
+  --str-chat__message-bubble-border-color: #1e293b;
   --str-chat__font-family: inherit;
+  
+  /* Force dark theme on all elements */
+  background: #0a0a0a !important;
+  color: #f8fafc !important;
 }
 .spotlight-chat .str-chat__message-notification,
 .spotlight-chat .str-chat__message-deleted {
@@ -22,14 +26,40 @@
 }
 
 
-/* Remove default backgrounds so it blends with your card */
+.spotlight-chat .chat-panel {
+  background: linear-gradient(135deg, #0a0a0a 0%, #111827 100%) !important;
+  border-color: #1e293b !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+}
+.spotlight-chat .chat-panel .chat-panel-header {
+  border-color: #1e293b !important;
+  background: rgba(15, 23, 42, 0.8) !important;
+  backdrop-filter: blur(8px);
+}
+
+/* Force dark backgrounds on all chat elements */
 .spotlight-chat .str-chat,
 .spotlight-chat .str-chat__container,
 .spotlight-chat .str-chat__list,
 .spotlight-chat .str-chat__channel,
 .spotlight-chat .str-chat__virtual-list,
-.spotlight-chat .str-chat__main-panel {
-  background: transparent !important;
+.spotlight-chat .str-chat__main-panel,
+.spotlight-chat .str-chat__thread,
+.spotlight-chat .str-chat__thread-list,
+.spotlight-chat .str-chat__message-list,
+.spotlight-chat .str-chat__message-list-container {
+  background: #0a0a0a !important;
+  color: #f8fafc !important;
+}
+
+/* Override any white backgrounds that might be coming from Stream.io defaults */
+.spotlight-chat * {
+  background-color: transparent !important;
+}
+
+.spotlight-chat .str-chat__list,
+.spotlight-chat .str-chat__message-list {
+  background: #0a0a0a !important;
 }
 
 /* Message list padding and separators */
@@ -37,8 +67,8 @@
   padding: 8px 8px 0 8px;
 }
 .spotlight-chat .str-chat__date-separator__date {
-  background: hsl(var(--muted));
-  color: hsl(var(--muted-foreground));
+  background: #111215;
+  color: #9ca3af;
   border-radius: 9999px;
   padding: 2px 8px;
 }
@@ -46,11 +76,20 @@
 /* Message bubbles */
 .spotlight-chat .str-chat__message-bubble {
   border-radius: var(--str-chat__message-bubble-border-radius);
-  border: 1px solid var(--str-chat__message-bubble-border-color);
+  border: 1px solid #1e293b;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  color: #f8fafc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+.spotlight-chat .str-chat__message-bubble:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 .spotlight-chat .str-chat__message-simple--me .str-chat__message-bubble {
-  background: hsl(var(--primary) / 0.12);
-  border-color: hsl(var(--primary) / 0.35);
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(139, 92, 246, 0.1) 100%);
+  border-color: rgba(139, 92, 246, 0.4);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.2);
 }
 
 /* Hide overly busy actions like inline reactions (optional) */
@@ -60,40 +99,255 @@
 
 /* Message input area */
 .spotlight-chat .str-chat__message-input {
-  background: transparent;
-  border-top: 1px solid hsl(var(--border));
+  background: rgba(15, 23, 42, 0.6);
+  border-top: 1px solid #1e293b;
+  backdrop-filter: blur(8px);
 }
 .spotlight-chat .str-chat__message-input-textarea-wrapper {
-  background: hsl(var(--muted));
-  border: 1px solid hsl(var(--border));
-  border-radius: 12px;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border: 1px solid #1e293b;
+  border-radius: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+.spotlight-chat .str-chat__message-input-textarea-wrapper:focus-within {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
 }
 .spotlight-chat .str-chat__message-input-textarea {
   background: transparent;
-  color: hsl(var(--foreground));
+  color: #f8fafc;
+  font-size: 14px;
+}
+.spotlight-chat .str-chat__message-input-textarea::placeholder {
+  color: #94a3b8;
 }
 .spotlight-chat .str-chat__send-button {
-  background: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
-  border-radius: 8px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
+  transition: all 0.2s ease;
+}
+.spotlight-chat .str-chat__send-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.4);
 }
 
 /* Avatars and usernames */
 .spotlight-chat .str-chat__avatar {
-  box-shadow: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border: 2px solid #1e293b;
 }
 .spotlight-chat .str-chat__message-simple__author {
-  color: hsl(var(--muted-foreground));
-  font-weight: 500;
+  color: #94a3b8;
+  font-weight: 600;
+  font-size: 13px;
 }
 
 /* Scrollbar aesthetics */
 .spotlight-chat .str-chat__list::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+}
+.spotlight-chat .str-chat__list::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 3px;
 }
 .spotlight-chat .str-chat__list::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted));
-  border-radius: 9999px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  border-radius: 3px;
+}
+.spotlight-chat .str-chat__list::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+}
+
+/* Additional enhancements */
+.spotlight-chat .str-chat__message-simple__timestamp {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.spotlight-chat .str-chat__date-separator {
+  margin: 16px 0;
+}
+
+.spotlight-chat .str-chat__date-separator__date {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  color: #94a3b8;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid #1e293b;
+}
+
+/* Force dark theme on all text elements */
+.spotlight-chat .str-chat__message-simple__text,
+.spotlight-chat .str-chat__message-simple__text-inner,
+.spotlight-chat .str-chat__message-text,
+.spotlight-chat .str-chat__message-text-inner,
+.spotlight-chat .str-chat__message-simple__content,
+.spotlight-chat .str-chat__message-simple__content-inner {
+  color: #f8fafc !important;
+  background: transparent !important;
+}
+
+/* Chat header styling */
+.spotlight-chat .str-chat__header,
+.spotlight-chat .str-chat__header-livestream,
+.spotlight-chat .str-chat__header-livestream-left,
+.spotlight-chat .str-chat__header-livestream-right {
+  background: rgba(15, 23, 42, 0.9) !important;
+  color: #f8fafc !important;
+  border-bottom: 1px solid #1e293b !important;
+}
+
+/* Ensure all divs and containers have dark backgrounds */
+.spotlight-chat div,
+.spotlight-chat span,
+.spotlight-chat p {
+  color: #f8fafc !important;
+}
+
+/* Override any remaining white backgrounds */
+.spotlight-chat .str-chat__message-simple,
+.spotlight-chat .str-chat__message-simple-inner,
+.spotlight-chat .str-chat__message-simple__content,
+.spotlight-chat .str-chat__message-simple__content-inner {
+  background: transparent !important;
+}
+
+/* Ensure the chat panel itself is dark */
+.spotlight-chat .chat-panel,
+.spotlight-chat .chat-panel * {
+  background: #000000 !important;
+  background-color: #000000 !important;
+  color: #f8fafc !important;
+}
+
+/* Nuclear option - force dark theme on everything */
+.spotlight-chat,
+.spotlight-chat *,
+.spotlight-chat *:before,
+.spotlight-chat *:after {
+  background-color: #000000 !important;
+  color: #f8fafc !important;
+}
+
+/* Force black background on all possible elements */
+.spotlight-chat .str-chat__container,
+.spotlight-chat .str-chat__main-panel,
+.spotlight-chat .str-chat__channel,
+.spotlight-chat .str-chat__list,
+.spotlight-chat .str-chat__virtual-list,
+.spotlight-chat .str-chat__message-list,
+.spotlight-chat .str-chat__message-list-container,
+.spotlight-chat .str-chat__thread,
+.spotlight-chat .str-chat__thread-list {
+  background: #000000 !important;
+  background-color: #000000 !important;
+}
+
+/* Remove any white backgrounds from corners and edges */
+.spotlight-chat .str-chat__message-list,
+.spotlight-chat .str-chat__list,
+.spotlight-chat .str-chat__virtual-list {
+  background: #000000 !important;
+  background-color: #000000 !important;
+  border: none !important;
+}
+
+/* But allow message bubbles to have their own styling */
+.spotlight-chat .str-chat__message-bubble,
+.spotlight-chat .str-chat__message-simple--me .str-chat__message-bubble {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+  color: #f8fafc !important;
+}
+
+.spotlight-chat .str-chat__message-simple--me .str-chat__message-bubble {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(139, 92, 246, 0.1) 100%) !important;
+}
+
+/* Input area styling */
+.spotlight-chat .str-chat__message-input,
+.spotlight-chat .str-chat__message-input-textarea-wrapper {
+  background: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+/* Header styling */
+.spotlight-chat .chat-panel-header {
+  background: #000000 !important;
+  background-color: #000000 !important;
+  color: #f8fafc !important;
+}
+
+/* Target any remaining white backgrounds or corners */
+.spotlight-chat .str-chat__message-list,
+.spotlight-chat .str-chat__list,
+.spotlight-chat .str-chat__virtual-list,
+.spotlight-chat .str-chat__message-list-container {
+  background: #000000 !important;
+  background-color: #000000 !important;
+  background-image: none !important;
+}
+
+/* Remove any white borders or outlines */
+.spotlight-chat .str-chat__message-list,
+.spotlight-chat .str-chat__list,
+.spotlight-chat .str-chat__virtual-list {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Force black on all divs and containers */
+.spotlight-chat div,
+.spotlight-chat .str-chat__message-list > div,
+.spotlight-chat .str-chat__list > div,
+.spotlight-chat .str-chat__virtual-list > div {
+  background: #000000 !important;
+  background-color: #000000 !important;
+}
+
+/* Override any inline styles that might be setting white backgrounds */
+.spotlight-chat [style*="background-color: white"],
+.spotlight-chat [style*="background-color: #fff"],
+.spotlight-chat [style*="background-color: #ffffff"],
+.spotlight-chat [style*="background: white"],
+.spotlight-chat [style*="background: #fff"],
+.spotlight-chat [style*="background: #ffffff"] {
+  background: #000000 !important;
+  background-color: #000000 !important;
+}
+
+/* Ultimate override - target every possible element */
+.spotlight-chat * {
+  background-color: #000000 !important;
+}
+
+/* But preserve message bubble styling */
+.spotlight-chat .str-chat__message-bubble {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+}
+
+.spotlight-chat .str-chat__message-simple--me .str-chat__message-bubble {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(139, 92, 246, 0.1) 100%) !important;
+}
+
+/* Input area */
+.spotlight-chat .str-chat__message-input-textarea-wrapper {
+  background: #1e293b !important;
+}
+
+/* Send button */
+.spotlight-chat .str-chat__send-button {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+}
+
+/* Date separators */
+.spotlight-chat .str-chat__date-separator__date {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
 }
 
 

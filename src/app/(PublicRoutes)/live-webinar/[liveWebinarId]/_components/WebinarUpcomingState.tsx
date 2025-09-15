@@ -26,17 +26,30 @@ const WebinarUpcomingState = ({ webinar, currentUser }: Props) => {
       if (!currentUser?.id) {
         throw new Error("User not Authenticated");
       }
-      await createAndStartStream(webinar);
+
+      // Start the stream first
+      const streamResult = await createAndStartStream(webinar);
+      if (!streamResult.success) {
+        throw new Error("Failed to start stream");
+      }
+
+      // Update webinar status to LIVE
       const res = await changeWebinarStatus(webinar.id, "LIVE");
       if (!res.success) {
         throw new Error(res.message);
       }
 
-      toast.success("Webinar started successfully!");
-      router.refresh();
-    } catch (error) {
+      toast.success(
+        "Webinar started successfully! You can now go live with OBS."
+      );
+
+      // Instead of router.refresh(), we'll use window.location.reload() for a cleaner transition
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error: any) {
       console.log("Error: ", error);
-      toast.error("Something went wrong");
+      toast.error(error.message || "Something went wrong");
     } finally {
       setLoading(false);
     }

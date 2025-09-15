@@ -165,6 +165,15 @@
   scrollbar-width: none;
 }
 
+/* Hide scrollbar utility (cross-browser) */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
 .iconBackground {
   border-radius: var(--radius-rounded-md, 0.375rem);
   border: 0.5px solid #a76ef6;
