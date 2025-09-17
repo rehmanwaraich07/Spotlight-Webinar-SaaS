@@ -28,6 +28,7 @@ const layout = async ({ children }: Props) => {
           key={uesrExists?.user.id}
           user={uesrExists?.user}
           stripeProducts={stripeProducts.products || []}
+          assistants={assistants.data || []}
         />
 
         <div className="flex-1 py-10">{children}</div>

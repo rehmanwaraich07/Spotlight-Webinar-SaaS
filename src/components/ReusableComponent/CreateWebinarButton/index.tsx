@@ -13,12 +13,14 @@ import CTAStep from "./CTAStep";
 import AdditionalInfoStep from "./AdditionalInfoStep";
 import Stripe from "stripe";
 import SucessStep from "./SucessStep";
+import { Assistant } from "@vapi-ai/server-sdk/api";
 
 type Props = {
   stripeProducts: Stripe.Product[] | [];
+  assistants: Assistant[] | [];
 };
 
-const CreateWebinarButton = ({ stripeProducts }: Props) => {
+const CreateWebinarButton = ({ stripeProducts, assistants }: Props) => {
   const { isModalOpen, setIsModalOpen, isComplete, setIsComplete, resetForm } =
     useWebinarStore();
   const [webinarLink, setWebinarLink] = useState("");
@@ -34,7 +36,10 @@ const CreateWebinarButton = ({ stripeProducts }: Props) => {
       title: "CTA",
       description: "Enter the CTA for Webinar",
       component: (
-        <CTAStep assistants={[]} stripeProducts={stripeProducts || []} />
+        <CTAStep
+          assistants={assistants || []}
+          stripeProducts={stripeProducts || []}
+        />
       ),
     },
     {
