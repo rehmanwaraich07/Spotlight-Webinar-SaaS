@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Sidebar from "@/components/ReusableComponent/LayoutComponnets/Sidebar";
 import Header from "@/components/ReusableComponent/LayoutComponnets/Header";
 import { getAllProductsFromStripe } from "@/actions/stripe";
+import { getAllVapiAssistants } from "@/actions/vapi";
 
 type Props = {
   children: React.ReactNode;
@@ -16,7 +17,7 @@ const layout = async ({ children }: Props) => {
   }
 
   const stripeProducts = await getAllProductsFromStripe();
-
+  const assistants = await getAllVapiAssistants();
   return (
     <div className="flex w-full min-h-screen">
       {/* Side Bar */}
