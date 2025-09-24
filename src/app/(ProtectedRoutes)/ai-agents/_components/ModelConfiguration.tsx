@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import ConfigField from "./ConfigField";
+import DropDownSelect from "./DropDownSelect";
 
 type Props = {};
 
@@ -106,9 +108,9 @@ const ModelConfiguration = (props: Props) => {
       </div>
 
       <div className="grid grid-cols-2 gap-6">
-        <ConfigFiled label="Provider">
+        <ConfigField label="Provider">
           <DropDownSelect value={assistant.model?.provider || ""} />
-        </ConfigFiled>
+        </ConfigField>
 
         <ConfigField label="Model" showInfo={true}>
           <DropDownSelect value={assistant.model?.model || ""} />
