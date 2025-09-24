@@ -52,3 +52,40 @@ export const createAsssitant = async (name: string) => {
     };
   }
 };
+
+export const updateAssitant = async (
+  assitantId: string,
+  firstMessage: string,
+  systemPrompt: string
+) => {
+  try {
+    const udpateAssitant = await vapiServer.assistants.update(assitantId, {
+      firstMessage: firstMessage,
+      model: {
+        model: "gpt-4o-mini",
+        provider: "openai",
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt,
+          },
+        ],
+      },
+    });
+    console.log("Assistant Updated: ", udpateAssitant);
+
+    return {
+      success: true,
+      status: 200,
+      data: udpateAssitant,
+    };
+  } catch (error) {
+    console.error("Failed to update the Assistant", error);
+    return {
+      success: false,
+      status: 500,
+      message: "Failed to udpate Assistant.",
+      error: error,
+    };
+  }
+};
