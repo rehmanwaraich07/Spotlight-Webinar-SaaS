@@ -172,3 +172,42 @@ export const changeAttendanceType = async (
     };
   }
 };
+
+export const getAttendeeById = async (id: string, webinarId: string) => {
+  try {
+    const attendee = await prismaClient.attendee.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    const attendance = await prismaClient.attendance.findFirst({
+      where: {
+        attendeeId: id,
+        webinarId: webinarId,
+      },
+    });
+
+    if (!attendance || !attendance) {
+      return {
+        success: false,
+        status: 404,
+        message: "Attendee not Found",
+      };
+    }
+
+    return {
+      status: 200,
+      success: true,
+      message: "Get Attendee details successfully!",
+      data: attendee,
+    };
+  } catch (error) {
+    console.error("Error: ", error);
+    return {
+      status: 500,
+      success: false,
+      message: "Something went wrong!",
+    };
+  }
+};
