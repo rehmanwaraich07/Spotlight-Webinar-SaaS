@@ -1,11 +1,13 @@
 import { getAttendeeById } from "@/actions/attendance";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import React from "react";
 import { AttendeeNotFoundError } from "./_components/AttendeeNotFoundError";
 import { WebinarNotStartedError } from "./_components/WebinarNotStartedError";
 import { WebinarConfigurationError } from "./_components/WebinarConfigurationError";
 import { getWebinarById } from "@/actions/webinar";
-import { WebinarStatusEnum } from "@prisma/client";
+import { CallStatusEnum, WebinarStatusEnum } from "@prisma/client";
+import { WebinarWithPresenter } from "@/lib/type";
+import AutoConnectCall from "./_components/AutoConnectCall";
 
 type Props = {
   params: Promise<{
@@ -21,7 +23,7 @@ const page = async ({ params, searchParams }: Props) => {
   const { attendeeId } = await searchParams;
 
   if (!liveWebinarId || !attendeeId) {
-    redirect("/404");
+    notFound();
   }
 
   const attendee = await getAttendeeById(attendeeId, liveWebinarId);
@@ -30,32 +32,46 @@ const page = async ({ params, searchParams }: Props) => {
     return <AttendeeNotFoundError liveWebinarId={liveWebinarId} />;
   }
 
-  const webianr = await getWebinarById(liveWebinarId);
+  const webinar = await getWebinarById(liveWebinarId);
 
-  if (!webianr) {
-    redirect("/404");
+  if (!webinar) {
+    notFound();
   }
 
   if (
-    webianr.webinarStatus === WebinarStatusEnum.WAITING_ROOM ||
-    webianr.webinarStatus === WebinarStatusEnum.SCHEDULED
+    webinar.webinarStatus === WebinarStatusEnum.WAITING_ROOM ||
+    webinar.webinarStatus === WebinarStatusEnum.SCHEDULED
   ) {
     return (
       <WebinarNotStartedError
         liveWebinarId={liveWebinarId}
-        webinarStatus={webianr.webinarStatus}
+        webinarStatus={webinar.webinarStatus}
       />
     );
   }
 
   if (
-    webianr.ctaType !== "BOOK_A_CALL" ||
-    !webianr.aiAgentId ||
-    !webianr.priceId
+    webinar.ctaType !== "BOOK_A_CALL" ||
+    !webinar.aiAgentId ||
+    !webinar.priceId
   ) {
     return <WebinarConfigurationError liveWebinarId={liveWebinarId} />;
   }
-  return <div>page</div>;
+
+  if (attendee.data.callStatus === CallStatusEnum.COMPLETED) {
+    redirect(`/live-webinar/${liveWebinarId}/`);
+  }
+
+  return (
+    <>
+      <AutoConnectCall
+        userName={attendee.data.name}
+        assistantId={webinar.aiAgentId}
+        webinar={webinar as WebinarWithPresenter}
+        userId={attendeeId}
+      />
+    </>
+  );
 };
 
 export default page;
