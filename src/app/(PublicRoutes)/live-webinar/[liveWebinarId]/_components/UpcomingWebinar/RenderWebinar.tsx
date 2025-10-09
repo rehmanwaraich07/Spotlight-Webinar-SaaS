@@ -118,7 +118,7 @@ const RenderWebinar = ({ apikey, error, user, webinar, recording }: Props) => {
                     className="cursor-pointer"
                     onClick={() => router.push("/")}
                   >
-                    Back to home
+                    Back to Home
                   </Button>
                 </div>
               </>
