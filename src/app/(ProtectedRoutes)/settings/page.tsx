@@ -13,17 +13,17 @@ import React from "react";
 type Props = {};
 
 const SettingsPage = async (props: Props) => {
-  const userExist = await onAuthenticateUser();
-  if (!userExist) {
+  const auth = await onAuthenticateUser();
+  if (auth.status !== 200 && auth.status !== 201) {
+    redirect("/sign-in");
+  }
+  if (!auth.user) {
     redirect("/sign-in");
   }
 
-  const isConnected = !!userExist?.user?.stripeConnectId;
+  const isConnected = !!auth.user.stripeConnectId;
 
-  const stripeLink = getStripeOAuthLink(
-    "api/stripe-connect",
-    userExist.user!.id
-  );
+  const stripeLink = getStripeOAuthLink("api/stripe-connect", auth.user.id);
   return (
     <div className="w-full mx-auto py-8 px-4">
       <h1 className="text-2xl font-bold mb-6">Payment Integration</h1>
