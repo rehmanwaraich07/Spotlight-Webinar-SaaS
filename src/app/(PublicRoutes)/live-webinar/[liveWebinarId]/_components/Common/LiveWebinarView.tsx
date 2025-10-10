@@ -389,6 +389,18 @@ const LiveWebinarView = ({
                 </Button>
               </div>
             )}
+            {!isHost && (
+              <div className="flex items-center space-x-1">
+                <Button
+                  onClick={handleCTAButtonClick}
+                  className="cursor-pointer"
+                >
+                  {webinar.ctaType === CtaTypeEnum.BOOK_A_CALL
+                    ? "Book a Call"
+                    : "Buy Now"}
+                </Button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -433,7 +445,7 @@ const LiveWebinarView = ({
         )}
       </div>
 
-      {dialogOpen && (
+      {!isHost && dialogOpen && (
         <CTADialogBox
           open={dialogOpen}
           onOpenChange={setDialogOpen}
