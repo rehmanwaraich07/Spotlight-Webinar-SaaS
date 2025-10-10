@@ -147,11 +147,14 @@ export const getTokenForHost = async (
   }
 };
 
-export const createAndStartStream = async (webinar: Webinar) => {
+export const createAndStartStream = async (
+  webinarId: string,
+  presenterId: string
+) => {
   try {
     const checkWebinar = await prismaClient.webinar.findMany({
       where: {
-        presenterId: webinar.presenterId,
+        presenterId: presenterId,
         webinarStatus: "LIVE",
       },
     });
@@ -160,13 +163,13 @@ export const createAndStartStream = async (webinar: Webinar) => {
       throw new Error("You already have a Live Webinar Running");
     }
 
-    const call = getStreamClient.video.call("livestream", webinar.id);
+    const call = getStreamClient.video.call("livestream", webinarId);
     await call.getOrCreate({
       data: {
-        created_by_id: webinar.presenterId,
+        created_by_id: presenterId,
         members: [
           {
-            user_id: webinar.presenterId,
+            user_id: presenterId,
             role: "host",
           },
         ],
@@ -179,7 +182,8 @@ export const createAndStartStream = async (webinar: Webinar) => {
     });
 
     console.log("Stream Created and Started Successfully!");
-    return { success: true, call };
+    // Return only serializable data to the client to avoid RSC serialization errors
+    return { success: true };
   } catch (error: any) {
     console.error("Failed to Create and Start the stream: ", error);
     throw new Error(`Failed to start stream: ${error.message}`);

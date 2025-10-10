@@ -28,13 +28,16 @@ const WebinarUpcomingState = ({ webinar, currentUser }: Props) => {
       }
 
       // Start the stream first
-      const streamResult = await createAndStartStream(webinar);
+      const streamResult = await createAndStartStream(
+        webinar.id,
+        webinar.presenterId
+      );
       if (!streamResult.success) {
         throw new Error("Failed to start stream");
       }
 
       // Update webinar status to LIVE
-      const res = await changeWebinarStatus(webinar.id, "LIVE");
+      const res = await changeWebinarStatus(webinar.id, WebinarStatusEnum.LIVE);
       if (!res.success) {
         throw new Error(res.message);
       }

@@ -125,7 +125,9 @@ const RenderWebinar = ({ apikey, error, user, webinar, recording }: Props) => {
             )}
           </div>
         </div>
-      ) : null}
+      ) : (
+        <WebinarUpcomingState currentUser={user || null} webinar={webinar} />
+      )}
     </React.Fragment>
   );
 };
