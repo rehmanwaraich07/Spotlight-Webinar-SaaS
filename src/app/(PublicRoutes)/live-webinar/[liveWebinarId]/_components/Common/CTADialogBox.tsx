@@ -1,4 +1,5 @@
 import { createCheckoutLink } from "@/actions/stripe";
+import { registerAttendee } from "@/actions/webinar";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,6 +15,7 @@ import { ChevronRight, Loader2, Play } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { toast } from "sonner";
+import { useAttendeeStore } from "@/store/useAttendeeStore";
 
 type Props = {
   open?: boolean;
@@ -21,6 +23,7 @@ type Props = {
   trigger?: React.ReactNode;
   webinar: WebinarWithPresenter;
   userId: string;
+  isHost?: boolean;
 };
 
 const CTADialogBox = ({
@@ -29,14 +32,47 @@ const CTADialogBox = ({
   trigger,
   webinar,
   userId,
+  isHost = false,
 }: Props) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const { attendee, setAttendee } = useAttendeeStore();
 
   const handleClick = async () => {
+    setLoading(true);
     try {
       if (webinar?.ctaType === "BOOK_A_CALL") {
-        router.push(`/live-webinar/${webinar.id}/call?attendeeId=${userId}`);
+        if (isHost) {
+          // For hosts, they can join the breakout room directly using their user ID
+          router.push(`/live-webinar/${webinar.id}/call?attendeeId=${userId}`);
+        } else {
+          // For participants, we need to ensure the attendee exists in the database
+          if (!attendee) {
+            toast.error("Please register for the webinar first");
+            return;
+          }
+
+          // Check if attendee is already registered for this webinar
+          const registrationResult = await registerAttendee({
+            webinarId: webinar.id,
+            email: attendee.email,
+            name: attendee.name,
+          });
+
+          if (!registrationResult.success) {
+            toast.error(
+              registrationResult.meessage ||
+                "Failed to register for breakout room"
+            );
+            return;
+          }
+
+          // Use the attendee ID from the registration result
+          const attendeeId = registrationResult.data?.user?.id || attendee.id;
+          router.push(
+            `/live-webinar/${webinar.id}/call?attendeeId=${attendeeId}`
+          );
+        }
       } else {
         if (!webinar.priceId || !webinar.presenter.stripeConnectId) {
           return toast.error("No PriceId or StripeConnected found");
@@ -59,6 +95,8 @@ const CTADialogBox = ({
     } catch (error) {
       console.error("Error in creating the checkout link: ", error);
       toast.error("Error in creating Checkout Link");
+    } finally {
+      setLoading(false);
     }
   };
   return (

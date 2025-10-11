@@ -6,8 +6,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { WebinarWithPresenter } from "@/lib/type";
 import { cn } from "@/lib/utils";
-import { vapi } from "@/lib/vapi/vapiclient";
-import { CallStatusEnum } from "@prisma/client";
+import { vapiClient } from "@/lib/vapi/vapiclient";
+import { CallStatusEnum, CtaTypeEnum } from "@prisma/client";
 import { Bot, Clock, Loader, Mic, MicOff, PhoneOff } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -40,6 +40,9 @@ const AutoConnectCall = ({
   const [userIsSpeaking, setUserIsSpeaking] = useState(false);
   const [isMicMuted, setIsMicMuted] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(callTimeLimit);
+  const [hasStarted, setHasStarted] = useState(false);
+  const [connectionTimeout, setConnectionTimeout] =
+    useState<NodeJS.Timeout | null>(null);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -49,14 +52,35 @@ const AutoConnectCall = ({
       .padStart(2, "0")}`;
   };
 
-  const cleanup = () => {
+  const cleanup = async () => {
+    try {
+      // Stop VAPI call if active
+      if (
+        callStatus === CallStatus.ACTIVE ||
+        callStatus === CallStatus.CONNECTING
+      ) {
+        await vapiClient.stop();
+      }
+    } catch (error) {
+      console.log("Error stopping VAPI call during cleanup:", error);
+    }
+
+    // Clear connection timeout
+    if (connectionTimeout) {
+      clearTimeout(connectionTimeout);
+      setConnectionTimeout(null);
+    }
+
+    // Reset the hasStarted flag
+    setHasStarted(false);
+
     if (refs.current.countdownTimer) {
       clearInterval(refs.current.countdownTimer);
       refs.current.countdownTimer = undefined;
     }
 
     if (refs.current.userSpeakingTimeout) {
-      clearInterval(refs.current.userSpeakingTimeout);
+      clearTimeout(refs.current.userSpeakingTimeout);
       refs.current.userSpeakingTimeout = undefined;
     }
 
@@ -123,14 +147,13 @@ const AutoConnectCall = ({
 
   const stopCall = async () => {
     try {
-      vapi.stop();
+      await cleanup();
       setCallStatus(CallStatus.FINISHED);
-      cleanup();
       const res = await changeCallStatus(userId, CallStatusEnum.COMPLETED);
       if (!res.success) {
         throw new Error("Failed to update call status");
       }
-      toast.success("Call ended sucessfully!");
+      toast.success("Call ended successfully!");
     } catch (error) {
       console.error("Failed to stop call", error);
       toast.error("Failed to stop call. Please try again.");
@@ -138,8 +161,17 @@ const AutoConnectCall = ({
   };
 
   useEffect(() => {
+    const vapi = vapiClient.getVapi();
+
     const onCallStart = async () => {
       console.log("Call Started");
+
+      // Clear the connection timeout since call has started
+      if (connectionTimeout) {
+        clearTimeout(connectionTimeout);
+        setConnectionTimeout(null);
+      }
+
       setCallStatus(CallStatus.ACTIVE);
       setupAudio();
 
@@ -157,10 +189,10 @@ const AutoConnectCall = ({
       }, 1000);
     };
 
-    const onCallEnd = () => {
+    const onCallEnd = async () => {
       console.log("Call Ended.");
       setCallStatus(CallStatus.FINISHED);
-      cleanup();
+      await cleanup();
     };
 
     const onSpeechStart = () => {
@@ -171,10 +203,10 @@ const AutoConnectCall = ({
       setAssistantSpeaking(false);
     };
 
-    const onError = (error: Error) => {
+    const onError = async (error: Error) => {
       console.error("Vapi error:", error);
       setCallStatus(CallStatus.FINISHED);
-      cleanup();
+      await cleanup();
     };
 
     vapi.on("call-start", onCallStart);
@@ -227,8 +259,55 @@ const AutoConnectCall = ({
 
   const startCall = async () => {
     try {
+      // Check if call is already active or has been started to prevent duplicate instances
+      if (
+        callStatus === CallStatus.ACTIVE ||
+        callStatus === CallStatus.CONNECTING ||
+        hasStarted
+      ) {
+        console.log(
+          "Call already active, connecting, or started, skipping start"
+        );
+        return;
+      }
+
+      console.log("Starting VAPI call with assistant ID:", assistantId);
+      console.log("User ID:", userId);
+      console.log("Webinar ID:", webinar.id);
+
+      // Validate assistant ID
+      if (!assistantId || assistantId.trim() === "") {
+        throw new Error("Assistant ID is missing or invalid");
+      }
+
+      setHasStarted(true);
       setCallStatus(CallStatus.CONNECTING);
-      await vapi.start(assistantId);
+
+      // Stop any existing call before starting a new one
+      try {
+        await vapiClient.stop();
+        console.log("Stopped any existing call");
+      } catch (stopError) {
+        // Ignore stop errors if no call is active
+        console.log("No active call to stop");
+      }
+
+      console.log("Starting VAPI call...");
+      await vapiClient.start(assistantId);
+      console.log("VAPI call started successfully");
+
+      // Set a timeout to handle cases where the call doesn't connect
+      const timeout = setTimeout(() => {
+        if (callStatus === CallStatus.CONNECTING) {
+          console.error("VAPI call connection timeout");
+          toast.error("Call connection timeout. Please try again.");
+          setCallStatus(CallStatus.FINISHED);
+          setHasStarted(false);
+        }
+      }, 30000); // 30 second timeout
+
+      setConnectionTimeout(timeout);
+
       const res = await changeCallStatus(userId, CallStatusEnum.InProgress);
       if (!res.success) {
         throw new Error("failed to update call status");
@@ -236,8 +315,19 @@ const AutoConnectCall = ({
       toast.success("Call started successfully!");
     } catch (error) {
       console.error("Failed to start call: ", error);
-      toast.error("Failed to start call. Please try again.");
+      console.error("Error details:", {
+        message: error instanceof Error ? error.message : "Unknown error",
+        assistantId,
+        userId,
+        webinarId: webinar.id,
+      });
+      toast.error(
+        `Failed to start call: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
       setCallStatus(CallStatus.FINISHED);
+      setHasStarted(false);
     }
   };
   // vapi call useEffect
@@ -248,7 +338,8 @@ const AutoConnectCall = ({
     startCall();
 
     return () => {
-      stopCall();
+      // Cleanup on component unmount
+      cleanup();
     };
   }, []);
 
@@ -375,6 +466,20 @@ const AutoConnectCall = ({
           <div className="absolute inset-0 bg-background/80 flex items-center justify-center flex-col gap-4 z-20">
             <Loader className="h-10 w-10 animate-spin text-accent" />
             <h3 className="text-xl font-medium ">Connecting...</h3>
+            <p className="text-sm text-muted-foreground">
+              This may take a few moments
+            </p>
+            <Button
+              onClick={() => {
+                setHasStarted(false);
+                setCallStatus(CallStatus.CONNECTING);
+                startCall();
+              }}
+              variant="outline"
+              className="mt-2"
+            >
+              Retry Connection
+            </Button>
           </div>
         )}
 
@@ -438,10 +543,8 @@ const AutoConnectCall = ({
             </button>
           </div>
 
-          {/* Buy Now Button to purchase the product  */}
           <div className="">
             <Button variant={"outline"} onClick={checkoutLink}>
-              {" "}
               Buy Now
             </Button>
 

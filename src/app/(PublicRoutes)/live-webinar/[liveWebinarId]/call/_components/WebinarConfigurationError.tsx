@@ -36,7 +36,6 @@ export const WebinarConfigurationError = ({
             <ul className="mt-2 space-y-1 text-sm">
               <li>• Call-to-Action type must be set to "Book a Call"</li>
               <li>• AI Agent must be configured</li>
-              <li>• Pricing must be set up</li>
             </ul>
             <p className="mt-2 text-sm">
               Please contact the webinar organizer to complete the setup.

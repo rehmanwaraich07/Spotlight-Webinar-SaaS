@@ -8,6 +8,7 @@ import { getWebinarById } from "@/actions/webinar";
 import { CallStatusEnum, WebinarStatusEnum } from "@prisma/client";
 import { WebinarWithPresenter } from "@/lib/type";
 import AutoConnectCall from "./_components/AutoConnectCall";
+import { onAuthenticateUser } from "@/actions/auth";
 
 type Props = {
   params: Promise<{
@@ -24,12 +25,6 @@ const page = async ({ params, searchParams }: Props) => {
 
   if (!liveWebinarId || !attendeeId) {
     notFound();
-  }
-
-  const attendee = await getAttendeeById(attendeeId, liveWebinarId);
-
-  if (!attendee.data) {
-    return <AttendeeNotFoundError liveWebinarId={liveWebinarId} />;
   }
 
   const webinar = await getWebinarById(liveWebinarId);
@@ -53,9 +48,33 @@ const page = async ({ params, searchParams }: Props) => {
   if (
     webinar.ctaType !== "BOOK_A_CALL" ||
     !webinar.aiAgentId ||
-    !webinar.priceId
+    webinar.aiAgentId.trim() === ""
   ) {
     return <WebinarConfigurationError liveWebinarId={liveWebinarId} />;
+  }
+
+  // Check if the attendeeId is the host (presenter)
+  const isHost = attendeeId === webinar.presenterId;
+
+  if (isHost) {
+    // For hosts, we can proceed directly without checking attendee records
+    return (
+      <>
+        <AutoConnectCall
+          userName={webinar.presenter.name}
+          assistantId={webinar.aiAgentId}
+          webinar={webinar as WebinarWithPresenter}
+          userId={attendeeId}
+        />
+      </>
+    );
+  }
+
+  // For participants, check if they have a valid attendee record
+  const attendee = await getAttendeeById(attendeeId, liveWebinarId);
+
+  if (!attendee.data) {
+    return <AttendeeNotFoundError liveWebinarId={liveWebinarId} />;
   }
 
   if (attendee.data.callStatus === CallStatusEnum.COMPLETED) {

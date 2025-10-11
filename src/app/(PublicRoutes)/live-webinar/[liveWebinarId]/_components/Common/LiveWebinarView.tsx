@@ -445,12 +445,13 @@ const LiveWebinarView = ({
         )}
       </div>
 
-      {!isHost && dialogOpen && (
+      {dialogOpen && (
         <CTADialogBox
           open={dialogOpen}
           onOpenChange={setDialogOpen}
           webinar={webinar}
           userId={userId}
+          isHost={isHost}
         />
       )}
 
