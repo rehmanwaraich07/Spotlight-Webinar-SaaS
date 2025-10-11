@@ -1,11 +1,14 @@
 "use client";
 
 import { changeCallStatus } from "@/actions/attendance";
+import { createCheckoutLink } from "@/actions/stripe";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { WebinarWithPresenter } from "@/lib/type";
 import { cn } from "@/lib/utils";
 import { vapi } from "@/lib/vapi/vapiclient";
 import { CallStatusEnum } from "@prisma/client";
-import { Bot, Clock, Mic, MicOff } from "lucide-react";
+import { Bot, Clock, Loader, Mic, MicOff, PhoneOff } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -189,7 +192,65 @@ const AutoConnectCall = ({
     };
   }, [userName, callTimeLimit]);
 
-  // TODO: vapi call useEffect
+  const toggleMicMute = () => {
+    if (refs.current.audioStream) {
+      refs.current.audioStream.getAudioTracks().forEach((track) => {
+        track.enabled = isMicMuted;
+      });
+    }
+    setIsMicMuted(!isMicMuted);
+  };
+
+  const checkoutLink = async () => {
+    try {
+      if (!webinar.priceId || !webinar?.presenter?.stripeConnectId) {
+        return toast.error("No priceId or Stripe Connected found");
+      }
+
+      const session = await createCheckoutLink(
+        webinar.priceId,
+        webinar.presenter.stripeConnectId,
+        userId,
+        webinar.id
+      );
+
+      if (!session.sessionUrl) {
+        throw new Error("Session ID not found in response");
+      }
+
+      window.open(session.sessionUrl, "_blank");
+    } catch (error) {
+      console.error("Failed to create the stripe checkout link", error);
+      toast.error("Failed to Create the Stripe Checkout Link");
+    }
+  };
+
+  const startCall = async () => {
+    try {
+      setCallStatus(CallStatus.CONNECTING);
+      await vapi.start(assistantId);
+      const res = await changeCallStatus(userId, CallStatusEnum.InProgress);
+      if (!res.success) {
+        throw new Error("failed to update call status");
+      }
+      toast.success("Call started successfully!");
+    } catch (error) {
+      console.error("Failed to start call: ", error);
+      toast.error("Failed to start call. Please try again.");
+      setCallStatus(CallStatus.FINISHED);
+    }
+  };
+  // vapi call useEffect
+
+  // call startup and cleanup
+
+  useEffect(() => {
+    startCall();
+
+    return () => {
+      stopCall();
+    };
+  }, []);
 
   return (
     <div className="flex flex-col h-[calc(100vh-80px)] bg-background">
@@ -262,6 +323,135 @@ const AutoConnectCall = ({
           >
             <Clock className="h-4 w-4" />
             <span>{formatTime(timeRemaining)}</span>
+          </div>
+
+          <div className="h-full flex justify-center items-center">
+            <div className="relative">
+              {userIsSpeaking && !isMicMuted && (
+                <>
+                  <div
+                    className="absolute inset-0 rounded-full border-4 border-accent animate-ping opacity-20"
+                    style={{ margin: "-8px" }}
+                  />
+                </>
+              )}
+
+              <div
+                className={cn(
+                  "flex justify-center items-center rounded-full overflow-hidden border-4",
+                  isMicMuted
+                    ? "border-destructive/50"
+                    : userIsSpeaking
+                    ? "border-accent-foreground"
+                    : "border-accent/20"
+                )}
+              >
+                <Avatar className="h-[100px] w-[100px]">
+                  <AvatarImage src={"/user-avatar.png"} alt={userName} />
+                  <AvatarFallback>{userName.split("")?.[0]}</AvatarFallback>
+                </Avatar>
+              </div>
+
+              {isMicMuted && (
+                <>
+                  <div className="absolute -bottom-2 -right-2 bg-destructive text-white p-2 rounded-full">
+                    <MicOff className="h-5 w-5" />
+                  </div>
+                </>
+              )}
+
+              {userIsSpeaking && !isMicMuted && (
+                <>
+                  <div className="absolute -bottom-2 -right-2 bg-accent text-white p-2 rounded-full">
+                    <Mic className="h-5 w-5" />
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {callStatus === CallStatus.CONNECTING && (
+          <div className="absolute inset-0 bg-background/80 flex items-center justify-center flex-col gap-4 z-20">
+            <Loader className="h-10 w-10 animate-spin text-accent" />
+            <h3 className="text-xl font-medium ">Connecting...</h3>
+          </div>
+        )}
+
+        {callStatus === CallStatus.FINISHED && (
+          <div className="absolute inset-0 bg-background/80 flex items-center justify-center flex-col gap-4 z-20">
+            <h3 className="text-xl font-medium">Call Ended</h3>
+            <p className="text-muted-foreground">Time Limit reached</p>
+          </div>
+        )}
+      </div>
+
+      <div className="bg-card border-t border-border p-4">
+        <div className="max-w-3xl mx-auto flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-2">
+            {callStatus === CallStatus.ACTIVE && (
+              <>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <span
+                    className={cn(
+                      "text-sm font-medium",
+                      timeRemaining < 30
+                        ? "text-destructive animate-pulse"
+                        : timeRemaining < 60
+                        ? "text-amber-500"
+                        : "text-muted-foreground"
+                    )}
+                  >
+                    {formatTime(timeRemaining)}
+                  </span>
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="flex items-center gap-4">
+            <button
+              onClick={toggleMicMute}
+              className={cn(
+                "p-3 rounded-full transition-all cursor-pointer",
+                isMicMuted
+                  ? "bg-destructive text-primary"
+                  : "bg-secondary hover:bg-secondary/80 text-foreground"
+              )}
+              disabled={callStatus !== CallStatus.ACTIVE}
+            >
+              {isMicMuted ? (
+                <MicOff className="h-6 w-6" />
+              ) : (
+                <Mic className="h-6 w-6" />
+              )}
+            </button>
+
+            <button
+              onClick={stopCall}
+              className="p-3 rounded-full bg-destructive text-primary hover:bg-destructive/90 transition-all cursor-pointer"
+              aria-label="End Call"
+              disabled={callStatus !== CallStatus.ACTIVE}
+            >
+              <PhoneOff className="h-6 w-6" />
+            </button>
+          </div>
+
+          {/* Buy Now Button to purchase the product  */}
+          <div className="">
+            <Button variant={"outline"} onClick={checkoutLink}>
+              {" "}
+              Buy Now
+            </Button>
+
+            <div className="hidden md:block">
+              {callStatus === CallStatus.ACTIVE && timeRemaining < 30 && (
+                <span className="text-destructive font-medium">
+                  Call ending soon
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>
