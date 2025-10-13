@@ -32,6 +32,18 @@ const layout = async ({ children }: Props) => {
         />
 
         <div className="flex-1 py-10">{children}</div>
+        {/* Footer credit across protected pages */}
+        <footer className="pb-6 pt-2 text-center text-xs text-muted-foreground">
+          Built with ♡ by
+          <a
+            href="https://instagram.com/rehman_waraich7"
+            target="_blank"
+            rel="noreferrer"
+            className="ml-1 underline underline-offset-4 text-primary hover:text-primary/90"
+          >
+            M.Rehman
+          </a>
+        </footer>
       </div>
     </div>
   );

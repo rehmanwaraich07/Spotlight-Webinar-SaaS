@@ -20,12 +20,12 @@ const Home = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 place-content-center">
           <FeatureCard
             Icon={<Upload className="w-10 h-10" />}
-            heading="Browse or drag a pre-recorded webinar file"
-            link="#"
+            heading="Browse the Recorded Webinars"
+            link="/recordings"
           />
           <FeatureCard
             Icon={<Webcam className="w-10 h-10" />}
-            heading="Browse or drag a pre-recorded webinar file"
+            heading="Create or Go Live a Webinar"
             link="/webinars"
           />
         </div>

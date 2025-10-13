@@ -10,6 +10,7 @@ import { vapiClient } from "@/lib/vapi/vapiclient";
 import { CallStatusEnum, CtaTypeEnum } from "@prisma/client";
 import { Bot, Clock, Loader, Mic, MicOff, PhoneOff } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 const CallStatus = {
@@ -35,14 +36,20 @@ const AutoConnectCall = ({
   callTimeLimit = 180,
   userName = "User",
 }: Props) => {
+  const router = useRouter();
   const [callStatus, setCallStatus] = useState(CallStatus.CONNECTING);
   const [assistantSpeaking, setAssistantSpeaking] = useState(false);
   const [userIsSpeaking, setUserIsSpeaking] = useState(false);
   const [isMicMuted, setIsMicMuted] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(callTimeLimit);
   const [hasStarted, setHasStarted] = useState(false);
-  const [connectionTimeout, setConnectionTimeout] =
-    useState<NodeJS.Timeout | null>(null);
+  const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const callStatusRef = useRef(callStatus);
+  const hasRetriedRef = useRef(false);
+
+  useEffect(() => {
+    callStatusRef.current = callStatus;
+  }, [callStatus]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -66,9 +73,9 @@ const AutoConnectCall = ({
     }
 
     // Clear connection timeout
-    if (connectionTimeout) {
-      clearTimeout(connectionTimeout);
-      setConnectionTimeout(null);
+    if (connectionTimeoutRef.current) {
+      clearTimeout(connectionTimeoutRef.current);
+      connectionTimeoutRef.current = null;
     }
 
     // Reset the hasStarted flag
@@ -136,12 +143,29 @@ const AutoConnectCall = ({
         }, 500);
       };
 
-      // continue monitoring
-      requestAnimationFrame(checkAudioLevel);
-
-      checkAudioLevel();
+      // continuously monitor audio levels
+      const loop = () => {
+        checkAudioLevel();
+        requestAnimationFrame(loop);
+      };
+      requestAnimationFrame(loop);
     } catch (error) {
       console.error("Failed to initialize audio:", error);
+    }
+  };
+
+  const ensureMicrophonePermission = async (): Promise<boolean> => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // Stop tracks immediately; this is just a permission preflight
+      stream.getTracks().forEach((t) => t.stop());
+      return true;
+    } catch (err) {
+      console.error("Microphone permission required:", err);
+      toast.error(
+        "Microphone permission denied. Please allow microphone access and retry."
+      );
+      return false;
     }
   };
 
@@ -167,9 +191,9 @@ const AutoConnectCall = ({
       console.log("Call Started");
 
       // Clear the connection timeout since call has started
-      if (connectionTimeout) {
-        clearTimeout(connectionTimeout);
-        setConnectionTimeout(null);
+      if (connectionTimeoutRef.current) {
+        clearTimeout(connectionTimeoutRef.current);
+        connectionTimeoutRef.current = null;
       }
 
       setCallStatus(CallStatus.ACTIVE);
@@ -203,8 +227,23 @@ const AutoConnectCall = ({
       setAssistantSpeaking(false);
     };
 
-    const onError = async (error: Error) => {
+    const onError = async (error: any) => {
       console.error("Vapi error:", error);
+      const isPermissionError =
+        (error &&
+          (error.name === "NotAllowedError" ||
+            error?.errorMsg?.toString?.().includes("NotAllowedError"))) ||
+        error?.action === "camera-error";
+
+      if (isPermissionError) {
+        toast.error(
+          "Microphone permission denied. Please allow access and click Retry."
+        );
+        setCallStatus(CallStatus.FINISHED);
+        await cleanup();
+        return;
+      }
+
       setCallStatus(CallStatus.FINISHED);
       await cleanup();
     };
@@ -260,14 +299,8 @@ const AutoConnectCall = ({
   const startCall = async () => {
     try {
       // Check if call is already active or has been started to prevent duplicate instances
-      if (
-        callStatus === CallStatus.ACTIVE ||
-        callStatus === CallStatus.CONNECTING ||
-        hasStarted
-      ) {
-        console.log(
-          "Call already active, connecting, or started, skipping start"
-        );
+      if (callStatus === CallStatus.ACTIVE || hasStarted) {
+        console.log("Call already active or already starting, skipping start");
         return;
       }
 
@@ -278,6 +311,14 @@ const AutoConnectCall = ({
       // Validate assistant ID
       if (!assistantId || assistantId.trim() === "") {
         throw new Error("Assistant ID is missing or invalid");
+      }
+
+      // Ask for mic access up-front; if declined, abort start
+      const micOk = await ensureMicrophonePermission();
+      if (!micOk) {
+        setHasStarted(false);
+        setCallStatus(CallStatus.FINISHED);
+        return;
       }
 
       setHasStarted(true);
@@ -298,15 +339,25 @@ const AutoConnectCall = ({
 
       // Set a timeout to handle cases where the call doesn't connect
       const timeout = setTimeout(() => {
-        if (callStatus === CallStatus.CONNECTING) {
+        // Only act if we're still in CONNECTING for this attempt
+        if (callStatusRef.current === CallStatus.CONNECTING) {
           console.error("VAPI call connection timeout");
           toast.error("Call connection timeout. Please try again.");
+          // Auto retry once
+          if (!hasRetriedRef.current) {
+            hasRetriedRef.current = true;
+            cleanup().finally(() => {
+              setHasStarted(false);
+              startCall();
+            });
+            return;
+          }
+
           setCallStatus(CallStatus.FINISHED);
           setHasStarted(false);
         }
       }, 30000); // 30 second timeout
-
-      setConnectionTimeout(timeout);
+      connectionTimeoutRef.current = timeout;
 
       const res = await changeCallStatus(userId, CallStatusEnum.InProgress);
       if (!res.success) {
@@ -342,6 +393,14 @@ const AutoConnectCall = ({
       cleanup();
     };
   }, []);
+
+  // Redirect to home when call finishes
+  useEffect(() => {
+    if (callStatus === CallStatus.FINISHED) {
+      const id = setTimeout(() => router.push("/"), 1200);
+      return () => clearTimeout(id);
+    }
+  }, [callStatus, router]);
 
   return (
     <div className="flex flex-col h-[calc(100vh-80px)] bg-background">
@@ -471,9 +530,12 @@ const AutoConnectCall = ({
             </p>
             <Button
               onClick={() => {
-                setHasStarted(false);
-                setCallStatus(CallStatus.CONNECTING);
-                startCall();
+                // Ensure previous attempt is fully cleaned up before retrying
+                cleanup().finally(() => {
+                  setHasStarted(false);
+                  // Let startCall set CONNECTING; don't pre-set it or the guard will block
+                  startCall();
+                });
               }}
               variant="outline"
               className="mt-2"
