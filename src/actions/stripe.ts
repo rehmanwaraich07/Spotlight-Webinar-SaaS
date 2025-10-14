@@ -4,6 +4,7 @@ import { stripe } from "@/lib/stripe";
 import { onAuthenticateUser } from "./auth";
 import Stripe from "stripe";
 import { prismaClient } from "@/lib/prismaClient";
+import { subscriptionPriceId } from "@/lib/data";
 import { changeAttendanceType } from "./attendance";
 import { toast } from "sonner";
 
@@ -66,9 +67,6 @@ export const onGetStripeClientSecret = async (
       return { status: 500, message: "Stripe not configured" };
     }
 
-    // Read the price id at request time to avoid stale build-time values
-    const subscriptionPriceId =
-      process.env.NEXT_PUBLIC_STRIPE_SUBSCRIPTION_PRICE_ID || "";
     if (!subscriptionPriceId) {
       return { status: 500, message: "Missing subscription price id" };
     }
@@ -93,16 +91,6 @@ export const onGetStripeClientSecret = async (
           stripeCustomerId: customer.id,
         },
       });
-
-      // Validate the price exists in the current Stripe mode (test/live)
-      try {
-        await stripe.prices.retrieve(subscriptionPriceId);
-      } catch (e) {
-        return {
-          status: 400,
-          message: "Invalid Stripe price id for current mode",
-        };
-      }
 
       const subscription = await stripe.subscriptions.create({
         customer: customer.id,

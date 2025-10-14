@@ -22,7 +22,7 @@ const getStripeEvent = async (
   if (!stripe) {
     throw new Error("Stripe not configured");
   }
-  
+
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!sig || !webhookSecret) {
     throw new Error("Stripe Signature or webhook secret missing");
