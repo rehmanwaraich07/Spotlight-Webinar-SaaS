@@ -157,7 +157,7 @@ export const createCheckoutLink = async (
           },
         ],
         mode: "payment",
-        success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/`,
+        success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/home`,
         cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/`,
         metadata: {
           attendeeId: attendeeId,
