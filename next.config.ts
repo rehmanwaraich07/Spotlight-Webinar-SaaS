@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
+
+  // Ensure API routes are properly handled during build
+  experimental: {
+    serverComponentsExternalPackages: ["@prisma/client"],
+  },
 };
 
 export default nextConfig;

@@ -10,6 +10,14 @@ import { toast } from "sonner";
 
 export const getAllProductsFromStripe = async () => {
   try {
+    if (!stripe) {
+      return {
+        error: "Stripe not configured",
+        status: 500,
+        success: false,
+      };
+    }
+
     const currentUser = await onAuthenticateUser();
 
     if (!currentUser) {
@@ -55,6 +63,10 @@ export const onGetStripeClientSecret = async (
   userId: string
 ) => {
   try {
+    if (!stripe) {
+      return { status: 500, message: "Stripe not configured" };
+    }
+
     let customer: Stripe.Customer;
     const existingCustomers = await stripe.customers.list({ email: email });
     if (existingCustomers.data.length > 0) {
@@ -124,6 +136,14 @@ export const createCheckoutLink = async (
   bookCall: boolean = false
 ) => {
   try {
+    if (!stripe) {
+      return {
+        error: "Stripe not configured",
+        status: 500,
+        success: false,
+      };
+    }
+
     const session = await stripe.checkout.sessions.create(
       {
         line_items: [

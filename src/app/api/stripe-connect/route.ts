@@ -4,6 +4,17 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
+    // Check if Stripe is properly configured
+    if (!stripe) {
+      console.log("Stripe not configured - missing STRIPE_SECRET_KEY");
+      return NextResponse.redirect(
+        new URL(
+          `/settings?success=false&message=Stripe+not+configured`,
+          request.url
+        )
+      );
+    }
+
     const searchParams = request.nextUrl.searchParams;
     const code = searchParams.get("code");
     const state = searchParams.get("state");
@@ -33,14 +44,24 @@ export async function GET(request: NextRequest) {
         throw new Error("Stripe user id not found");
       }
 
-      await prismaClient.user.update({
-        where: {
-          id: state!,
-        },
-        data: {
-          stripeConnectId: response.stripe_user_id,
-        },
-      });
+      // Validate state parameter before database operation
+      if (!state || typeof state !== "string") {
+        throw new Error("Invalid state parameter");
+      }
+
+      try {
+        await prismaClient.user.update({
+          where: {
+            id: state,
+          },
+          data: {
+            stripeConnectId: response.stripe_user_id,
+          },
+        });
+      } catch (dbError) {
+        console.error("Database error during Stripe Connect:", dbError);
+        throw new Error("Failed to update user with Stripe Connect ID");
+      }
 
       console.log("Stripe Account Connected successfully", {
         userId: state,
