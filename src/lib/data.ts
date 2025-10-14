@@ -91,7 +91,7 @@ export const potentialCustomer = [
 // Subscription price ID for Spotlight subscription
 // In production, read from environment to avoid sandbox/live mismatch
 export const subscriptionPriceId =
-  process.env.NEXT_PUBLIC_STRIPE_SUBSCRIPTION_PRICE_ID || "";
+  process.env.NEXT_PUBLIC_STRIPE_SUBSCRIPTION_PRICE_ID || "prod_Sscj39BmcJsBeM";
 
 export const aiAgentPrompt = `# Lead Qualification & Nurturing Agent Prompt
 
