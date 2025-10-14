@@ -37,9 +37,7 @@ export const createWebinar = async (formData: WebinarFormState) => {
       };
     }
 
-    const skipSubscriptionCheck =
-      process.env.SKIP_SUBSCRIPTION_CHECK === "true";
-    if (!skipSubscriptionCheck && !user.user?.subscription) {
+    if (!user.user?.subscription) {
       return {
         status: 403,
         message: "You need to have a subscription to create a webinar.",
