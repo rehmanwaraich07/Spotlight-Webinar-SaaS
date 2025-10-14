@@ -67,6 +67,10 @@ export const onGetStripeClientSecret = async (
       return { status: 500, message: "Stripe not configured" };
     }
 
+    if (!subscriptionPriceId) {
+      return { status: 500, message: "Missing subscription price id" };
+    }
+
     let customer: Stripe.Customer;
     const existingCustomers = await stripe.customers.list({ email: email });
     if (existingCustomers.data.length > 0) {
