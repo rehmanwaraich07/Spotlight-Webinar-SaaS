@@ -6,8 +6,6 @@ import { usePathname, useRouter } from "next/navigation";
 import PurpleIcon from "../PurpleIcon";
 import CreateWebinarButton from "../CreateWebinarButton";
 import Stripe from "stripe";
-import { StripeElements } from "../Stripe/Element";
-import SubscriptionModal from "../SubscriptionModal";
 import { Assistant } from "@vapi-ai/server-sdk/api";
 
 type Props = {
@@ -40,17 +38,11 @@ const Header = ({ user, stripeProducts, assistants }: Props) => {
           <Zap className="cursor-pointer w-5 h-5" />
         </PurpleIcon>
 
-        {/* TODO: add the stripe subscription and create webinar button */}
-        {user?.subscription ? (
-          <CreateWebinarButton
-            stripeProducts={stripeProducts}
-            assistants={assistants}
-          />
-        ) : (
-          <StripeElements>
-            {user && <SubscriptionModal user={user} />}
-          </StripeElements>
-        )}
+        {/* Create webinar button - now available for all users */}
+        <CreateWebinarButton
+          stripeProducts={stripeProducts}
+          assistants={assistants}
+        />
       </div>
     </div>
   );

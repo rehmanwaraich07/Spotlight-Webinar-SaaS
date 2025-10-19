@@ -37,13 +37,6 @@ export const createWebinar = async (formData: WebinarFormState) => {
       };
     }
 
-    if (!user.user?.subscription) {
-      return {
-        status: 403,
-        message: "You need to have a subscription to create a webinar.",
-      };
-    }
-
     const presenterId: string | undefined = user.user?.id;
 
     console.log("FormData: ", formData, presenterId);
